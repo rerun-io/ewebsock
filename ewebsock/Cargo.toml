@@ -20,7 +20,7 @@ include = [
 
 [features]
 default = ["with_tungstenite"]
-tls = ["tokio-tungstenite/native-tls"]
+tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
 with_tungstenite = ["async-stream", "futures", "futures-util", "tokio", "tokio-tungstenite", "tungstenite"]
 
 [dependencies]

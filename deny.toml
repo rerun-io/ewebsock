@@ -44,5 +44,22 @@ allow = [
     "CC0-1.0",                        # https://creativecommons.org/publicdomain/zero/1.0/
     "ISC",                            # https://tldrlegal.com/license/-isc-license
     "MIT",                            # https://tldrlegal.com/license/mit-license
+    "MPL-2.0",                        # https://www.mozilla.org/en-US/MPL/2.0/FAQ/ - see Q11
+    "OpenSSL",                        # https://www.openssl.org/source/license.html
     "Zlib",                           # https://tldrlegal.com/license/zlib-libpng-license-(zlib)
 ]
+
+[[licenses.clarify]]
+name = "webpki"
+expression = "ISC"
+license-files = [
+    { path = "LICENSE", hash = 0x001c7e6c }
+]
+
+[[licenses.clarify]]
+name = "ring"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 }
+]
+

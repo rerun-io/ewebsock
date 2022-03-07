@@ -4,6 +4,7 @@ use ewebsock::{WsEvent, WsMessage, WsReceiver, WsSender};
 #[derive(Default)]
 pub struct ExampleApp {
     url: String,
+    error: String,
     frontend: Option<FrontEnd>,
 }
 
@@ -25,7 +26,7 @@ impl epi::App for ExampleApp {
             }
         }
         if self.url.is_empty() {
-            self.url = "ws://echo.websocket.events/.ws".into(); // echo server
+            self.url = "wss://echo.websocket.events/.ws".into(); // echo server
         }
 
         self.connect(frame.clone());
@@ -55,6 +56,15 @@ impl epi::App for ExampleApp {
             });
         });
 
+        if !self.error.is_empty() {
+            egui::TopBottomPanel::top("error").show(ctx, |ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Error:");
+                    ui.colored_label(egui::Color32::RED, &self.error);
+                });
+            });
+        }
+
         if let Some(frontend) = &mut self.frontend {
             frontend.ui(ctx);
         }
@@ -64,8 +74,16 @@ impl epi::App for ExampleApp {
 impl ExampleApp {
     fn connect(&mut self, frame: epi::Frame) {
         let wakeup = move || frame.request_repaint(); // wake up UI thread on new message
-        let (ws_sender, ws_receiver) = ewebsock::connect_with_wakeup(&self.url, wakeup).unwrap();
-        self.frontend = Some(FrontEnd::new(ws_sender, ws_receiver));
+        match ewebsock::connect_with_wakeup(&self.url, wakeup) {
+            Ok((ws_sender, ws_receiver)) => {
+                self.frontend = Some(FrontEnd::new(ws_sender, ws_receiver));
+                self.error.clear();
+            }
+            Err(error) => {
+                tracing::error!("Failed to connect to {:?}: {}", &self.url, error);
+                self.error = error;
+            }
+        }
     }
 }
 

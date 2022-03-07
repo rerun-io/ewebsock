@@ -60,7 +60,7 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
             }
             eprintln!("Stopping websocket receiver thread")
         })
-        .unwrap();
+        .exepct("Failed to spawn thread");
 
     Ok(WsSender { sender })
 }

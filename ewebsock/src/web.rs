@@ -54,17 +54,19 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
                 on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())));
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
                 // better alternative to juggling with FileReader is to use https://crates.io/crates/gloo-file
-                let fr = web_sys::FileReader::new().unwrap();
-                let fr_c = fr.clone();
+                let file_reader = web_sys::FileReader::new().expect("Failed to create FileReader");
+                let file_reader_clone = file_reader.clone();
                 // create onLoadEnd callback
                 let on_event = on_event.clone();
                 let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
-                    let array = js_sys::Uint8Array::new(&fr_c.result().unwrap());
+                    let array = js_sys::Uint8Array::new(&file_reader_clone.result().unwrap());
                     on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())));
                 })
                     as Box<dyn FnMut(web_sys::ProgressEvent)>);
-                fr.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
-                fr.read_as_array_buffer(&blob).expect("blob not readable");
+                file_reader.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
+                file_reader
+                    .read_as_array_buffer(&blob)
+                    .expect("blob not readable");
                 onloadend_cb.forget();
             } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
                 on_event(WsEvent::Message(WsMessage::Text(string_from_js_string(

@@ -204,6 +204,6 @@ pub fn connect_with_wakeup(
     wake_up: impl Fn() + Send + Sync + 'static,
 ) -> Result<(WsSender, WsReceiver)> {
     let (receiver, on_event) = WsReceiver::new_with_callback(wake_up);
-    let sender = ws_connect(url.into(), on_event).unwrap();
+    let sender = ws_connect(url.into(), on_event)?;
     Ok((sender, receiver))
 }

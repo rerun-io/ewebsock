@@ -15,12 +15,16 @@ async fn ws_connect_async(
     url: String,
     outgoing_messages_stream: impl futures::Stream<Item = WsMessage>,
     on_event: EventHandler,
-) -> Result<()> {
+) {
     use futures::StreamExt as _;
 
-    let (ws_stream, _) = tokio_tungstenite::connect_async(url)
-        .await
-        .map_err(|err| err.to_string())?;
+    let (ws_stream, _) = match tokio_tungstenite::connect_async(url).await {
+        Ok(result) => result,
+        Err(err) => {
+            on_event(WsEvent::Error(err.to_string()));
+            return;
+        }
+    };
 
     tracing::info!("WebSocket handshake has been successfully completed");
     on_event(WsEvent::Opened);
@@ -67,8 +71,6 @@ async fn ws_connect_async(
 
     futures_util::pin_mut!(reader, writer);
     futures_util::future::select(reader, writer).await;
-
-    Ok(())
 }
 
 /// Call the given event handler on each new received event.
@@ -90,6 +92,8 @@ pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
         }
     };
 
-    tokio::spawn(async move { ws_connect_async(url, outgoing_messages_stream, on_event).await });
+    tokio::spawn(async move {
+        ws_connect_async(url.clone(), outgoing_messages_stream, on_event).await;
+    });
     WsSender { tx }
 }

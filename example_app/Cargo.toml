@@ -18,7 +18,7 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
-ewebsock = { path = "../ewebsock" }
+ewebsock = { path = "../ewebsock", features = ["tls"] }
 
 eframe = "0.17.0" # Gives us egui, epi and web+native backends
 tracing = "0.1"

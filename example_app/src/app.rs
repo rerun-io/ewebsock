@@ -26,7 +26,7 @@ impl epi::App for ExampleApp {
             }
         }
         if self.url.is_empty() {
-            self.url = "ws://echo.websocket.events/.ws".into(); // echo server
+            self.url = "wss://echo.websocket.events/.ws".into(); // echo server
         }
 
         self.connect(frame.clone());

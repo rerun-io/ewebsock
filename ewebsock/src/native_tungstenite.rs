@@ -1,5 +1,8 @@
 use crate::{EventHandler, Result, WsEvent, WsMessage};
 
+/// This is how you send messages to the server.
+///
+/// When the last clone of this is dropped, the connection is closed.
 pub struct WsSender {
     tx: tokio::sync::mpsc::Sender<WsMessage>,
 }
@@ -90,10 +93,12 @@ pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
         while let Some(item) = rx.recv().await {
             yield item;
         }
+        tracing::debug!("WsSender dropped - closing connection.");
     };
 
     tokio::spawn(async move {
         ws_connect_async(url.clone(), outgoing_messages_stream, on_event).await;
+        tracing::debug!("WS connection finished.");
     });
     WsSender { tx }
 }

@@ -44,6 +44,10 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling
     ws.set_binary_type(web_sys::BinaryType::Arraybuffer);
 
+    // Allow it to be shared by the different callbacks:
+    let on_event: std::rc::Rc<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>> =
+        on_event.into();
+
     // onmessage callback
     {
         let on_event = on_event.clone();

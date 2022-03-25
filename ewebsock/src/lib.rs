@@ -158,10 +158,9 @@ impl WsReceiver {
     /// This can be used to wake up the UI thread.
     pub fn new_with_callback(wake_up: impl Fn() + Send + Sync + 'static) -> (Self, EventHandler) {
         let (tx, rx) = std::sync::mpsc::channel();
-        let tx = std::sync::Mutex::new(tx);
-        let on_event = std::sync::Arc::new(move |event| {
+        let on_event = Box::new(move |event| {
             wake_up(); // wake up UI thread
-            if tx.lock().unwrap().send(event).is_ok() {
+            if tx.send(event).is_ok() {
                 std::ops::ControlFlow::Continue(())
             } else {
                 std::ops::ControlFlow::Break(())
@@ -179,7 +178,7 @@ impl WsReceiver {
 pub type Error = String;
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub type EventHandler = std::sync::Arc<dyn Sync + Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
+pub type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
 
 /// The easiest to use function.
 ///

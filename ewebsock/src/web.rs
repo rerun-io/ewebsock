@@ -29,6 +29,12 @@ impl WsSender {
             tracing::error!("Failed to send: {:?}", err);
         }
     }
+
+    /// On WASM targets the WebSocket will not be closed when the last reference to WsSender is dropped.
+    pub fn close(&mut self) -> Result<()> {
+        let result = self.ws.close();
+        result.map_err(string_from_js_value)
+    }
 }
 
 /// Call the given event handler on each new received event.

@@ -106,11 +106,20 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     }
 
     {
+        let on_event = on_event.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             on_event(WsEvent::Opened);
         }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
         onopen_callback.forget();
+    }
+
+    {
+        let onclose_callback = Closure::wrap(Box::new(move |_| {
+            on_event(WsEvent::Closed);
+        }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
+        ws.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));
+        onclose_callback.forget();
     }
 
     Ok(WsSender { ws })

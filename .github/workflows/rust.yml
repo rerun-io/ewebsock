@@ -10,7 +10,7 @@ env:
 
 jobs:
   check:
-    name: Rust format, check, cranky
+    name: Rust format, cranky, check, test, doc
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,6 +24,9 @@ jobs:
       - run: |
           sudo apt-get update
           sudo apt-get install libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libspeechd-dev libxkbcommon-dev libssl-dev
+
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-cranky
         uses: baptiste0928/cargo-install@v1
@@ -83,7 +86,12 @@ jobs:
           toolchain: 1.65.0
           target: wasm32-unknown-unknown
           override: true
-      - uses: actions-rs/cargo@v1
+
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check wasm32
+        uses: actions-rs/cargo@v1
         with:
           command: check
           args: --all-features --lib --target wasm32-unknown-unknown

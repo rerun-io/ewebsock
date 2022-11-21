@@ -1,5 +1,5 @@
 ## Unreleased
-* Add callback for close notification to WASM WebSocket.
+* Fix: `WsEvent::Closed` is correctly sent on web when socket is closed.
 
 ## 0.2.0 - 2022-04-08
 * Support WSS (WebSocket Secure) / TLS

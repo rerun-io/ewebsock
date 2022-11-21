@@ -1,16 +1,29 @@
 use crate::{EventHandler, Result, WsEvent, WsMessage};
 
+#[allow(clippy::needless_pass_by_value)]
 fn string_from_js_value(s: wasm_bindgen::JsValue) -> String {
     s.as_string().unwrap_or(format!("{:#?}", s))
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn string_from_js_string(s: js_sys::JsString) -> String {
     s.as_string().unwrap_or(format!("{:#?}", s))
 }
 
+/// This is how you send messages to the server.
+///
+/// When the last clone of this is dropped, the connection is closed.
 #[derive(Clone)]
 pub struct WsSender {
     ws: web_sys::WebSocket,
+}
+
+impl Drop for WsSender {
+    fn drop(&mut self) {
+        if let Err(err) = self.ws.close() {
+            tracing::warn!("Failed to close web-socket: {:?}", err);
+        }
+    }
 }
 
 impl WsSender {
@@ -32,6 +45,7 @@ impl WsSender {
 }
 
 /// Call the given event handler on each new received event.
+#[allow(clippy::needless_pass_by_value)]
 pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
 

@@ -1,6 +1,4 @@
 ## Unreleased
-
-## 0.2.1 - 2022-11-21
 * Add callback for close notification to WASM WebSocket.
 
 ## 0.2.0 - 2022-04-08

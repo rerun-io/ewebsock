@@ -22,7 +22,7 @@ impl epi::App for ExampleApp {
         if let Some(web_info) = &frame.info().web_info {
             // allow `?url=` query param
             if let Some(url) = web_info.location.query_map.get("url") {
-                self.url = url.clone()
+                self.url = url.clone();
             }
         }
         if self.url.is_empty() {

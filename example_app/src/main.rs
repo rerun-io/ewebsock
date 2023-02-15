@@ -11,3 +11,21 @@ async fn main() {
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(Box::new(app), native_options);
 }
+
+// when compiling to web using trunk.
+#[cfg(target_arch = "wasm32")]
+fn main() {
+    
+    console_error_panic_hook::set_once();
+    tracing_wasm::set_as_global_default();
+
+    let app = example_app::ExampleApp::default();
+
+    wasm_bindgen_futures::spawn_local(async {
+        eframe::start_web(
+            "ewebsock_test",
+            Box::new(app),
+        )
+        .expect("failed to start eframe");
+    });
+}

@@ -33,6 +33,8 @@
             overflow: hidden;
             margin: 0 !important;
             padding: 0 !important;
+            height: 100%;
+            width: 100%;
         }
 
         /* Position canvas in center-top: */
@@ -139,10 +141,16 @@
             console.log("loaded wasm, starting egui app…");
 
             // This call installs a bunch of callbacks and then returns:
-            wasm_bindgen.start("the_canvas_id");
+            wasm_bindgen.start("the_canvas_id").then(on_app_started).catch(on_error);
+        }
 
+        function on_app_started(handle) {
             console.log("egui app started.");
             document.getElementById("loading").remove();
+        }
+
+        function on_error(error) {
+            console.error("Failed to start: " + error);
         }
     </script>
 </body>

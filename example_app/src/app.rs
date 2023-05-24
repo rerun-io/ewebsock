@@ -1,4 +1,4 @@
-use eframe::{egui, epi};
+use eframe::egui;
 use ewebsock::{WsEvent, WsMessage, WsReceiver, WsSender};
 
 #[derive(Default)]
@@ -8,37 +8,15 @@ pub struct ExampleApp {
     frontend: Option<FrontEnd>,
 }
 
-impl epi::App for ExampleApp {
-    fn name(&self) -> &str {
-        "ewebsocket example app"
-    }
-
-    fn setup(
-        &mut self,
-        _ctx: &egui::Context,
-        frame: &epi::Frame,
-        _storage: Option<&dyn epi::Storage>,
-    ) {
-        if let Some(web_info) = &frame.info().web_info {
-            // allow `?url=` query param
-            if let Some(url) = web_info.location.query_map.get("url") {
-                self.url = url.clone();
-            }
-        }
-        if self.url.is_empty() {
-            self.url = "wss://echo.websocket.events/.ws".into(); // echo server
-        }
-
-        self.connect(frame.clone());
-    }
-
-    fn update(&mut self, ctx: &egui::Context, frame: &epi::Frame) {
-        if !frame.is_web() {
+impl eframe::App for ExampleApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
             egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
                 egui::menu::bar(ui, |ui| {
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
-                            frame.quit();
+                            _frame.close();
                         }
                     });
                 });
@@ -49,9 +27,9 @@ impl epi::App for ExampleApp {
             ui.horizontal(|ui| {
                 ui.label("URL:");
                 if ui.text_edit_singleline(&mut self.url).lost_focus()
-                    && ui.input().key_pressed(egui::Key::Enter)
+                    && ui.input(|i| i.key_pressed(egui::Key::Enter))
                 {
-                    self.connect(frame.clone());
+                    self.connect(ctx.clone());
                 }
             });
         });
@@ -72,15 +50,15 @@ impl epi::App for ExampleApp {
 }
 
 impl ExampleApp {
-    fn connect(&mut self, frame: epi::Frame) {
-        let wakeup = move || frame.request_repaint(); // wake up UI thread on new message
+    fn connect(&mut self, ctx: egui::Context) {
+        let wakeup = move || ctx.request_repaint(); // wake up UI thread on new message
         match ewebsock::connect_with_wakeup(&self.url, wakeup) {
             Ok((ws_sender, ws_receiver)) => {
                 self.frontend = Some(FrontEnd::new(ws_sender, ws_receiver));
                 self.error.clear();
             }
             Err(error) => {
-                tracing::error!("Failed to connect to {:?}: {}", &self.url, error);
+                log::error!("Failed to connect to {:?}: {}", &self.url, error);
                 self.error = error;
             }
         }
@@ -115,7 +93,7 @@ impl FrontEnd {
             ui.horizontal(|ui| {
                 ui.label("Message to send:");
                 if ui.text_edit_singleline(&mut self.text_to_send).lost_focus()
-                    && ui.input().key_pressed(egui::Key::Enter)
+                    && ui.input(|i| i.key_pressed(egui::Key::Enter))
                 {
                     self.ws_sender
                         .send(WsMessage::Text(std::mem::take(&mut self.text_to_send)));

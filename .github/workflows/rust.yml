@@ -105,4 +105,4 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@v1
         with:
           rust-version: "1.65.0"
-          arguments: --log-level error
+          log-level: error

@@ -1,6 +1,6 @@
 use crate::{EventHandler, Result, WsEvent, WsMessage};
 
-/// This is how you send messages to the server.
+/// This is how you send [`WsMessage`]s to the server.
 ///
 /// When the last clone of this is dropped, the connection is closed.
 pub struct WsSender {
@@ -8,6 +8,9 @@ pub struct WsSender {
 }
 
 impl WsSender {
+    /// Send a message.
+    ///
+    /// You have to wait for [`WsEvent::Opened`] before you can start sending messages.
     pub fn send(&mut self, msg: WsMessage) {
         let tx = self.tx.clone();
         tokio::spawn(async move { tx.send(msg).await });
@@ -78,6 +81,8 @@ async fn ws_connect_async(
 
 /// Call the given event handler on each new received event.
 ///
+/// This is a more advanced version of [`connect`].
+///
 /// # Errors
 /// * On native: never.
 /// * On web: failure to use `WebSocket` API.
@@ -85,7 +90,7 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     Ok(ws_connect_native(url, on_event))
 }
 
-/// Call the given event handler on each new received event.
+/// Like [`ws_connect`], but cannot fail. Only available on native builds.
 pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 

@@ -27,6 +27,7 @@ impl Drop for WsSender {
 }
 
 impl WsSender {
+    /// Send the message to the server.
     pub fn send(&mut self, msg: WsMessage) {
         let result = match msg {
             WsMessage::Binary(data) => {
@@ -45,6 +46,12 @@ impl WsSender {
 }
 
 /// Call the given event handler on each new received event.
+///
+/// This is a more advanced version of [`crate::connect`].
+///
+/// # Errors
+/// * On native: never.
+/// * On web: failure to use `WebSocket` API.
 #[allow(clippy::needless_pass_by_value)]
 pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html

@@ -24,6 +24,13 @@ impl WsSender {
     }
 }
 
+/// Call the given event handler on each new received event.
+///
+/// This is a more advanced version of [`connect`].
+///
+/// # Errors
+/// * On native: never.
+/// * On web: failure to use `WebSocket` API.
 pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     let client = websocket::ClientBuilder::new(&url)
         .map_err(|err| err.to_string())?

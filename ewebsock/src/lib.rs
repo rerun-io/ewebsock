@@ -9,13 +9,15 @@
 //! }
 //! ```
 
+#![warn(missing_docs)] // let's keep ewebsock well-documented
+
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "websocket")]
-pub mod native_websocket;
+mod native_websocket;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "with_tungstenite")]
-pub mod native_tungstenite;
+mod native_tungstenite;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "with_tungstenite")]
@@ -57,12 +59,20 @@ pub enum WsMessage {
 /// Something happening with the connection.
 #[derive(Clone, Debug)]
 pub enum WsEvent {
+    /// The connection has been established, and you can start sending messages.
     Opened,
+
+    /// A message has been received.
     Message(WsMessage),
+
+    /// An error occurred.
     Error(String),
+
+    /// The connection has been closed.
     Closed,
 }
 
+/// Receiver for incoming [`WsEvent`]s.
 pub struct WsReceiver {
     rx: std::sync::mpsc::Receiver<WsEvent>,
 }
@@ -90,21 +100,28 @@ impl WsReceiver {
         (ws_receiver, on_event)
     }
 
+    /// Try receiving a new event without blocking.
     pub fn try_recv(&self) -> Option<WsEvent> {
         self.rx.try_recv().ok()
     }
 }
 
+/// An error.
 pub type Error = String;
+
+/// Short for `Result<T, ewebsock::Error>`.
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
+pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
 
-/// The easiest to use function.
+/// Connect to the given URL, and return a sender and receiver.
 ///
 /// # Errors
 /// * On native: never.
 /// * On web: failure to use `WebSocket` API.
+///
+/// See also the [`connect_with_wakeup`] function,
+/// and the more advanced [`ws_connect`].
 pub fn connect(url: impl Into<String>) -> Result<(WsSender, WsReceiver)> {
     let (ws_receiver, on_event) = WsReceiver::new();
     let ws_sender = ws_connect(url.into(), on_event)?;
@@ -118,6 +135,8 @@ pub fn connect(url: impl Into<String>) -> Result<(WsSender, WsReceiver)> {
 /// # Errors
 /// * On native: never.
 /// * On web: failure to use `WebSocket` API.
+///
+/// Note that you have to wait for [`WsEvent::Opened`] before sending messages.
 pub fn connect_with_wakeup(
     url: impl Into<String>,
     wake_up: impl Fn() + Send + Sync + 'static,

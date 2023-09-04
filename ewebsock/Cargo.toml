@@ -13,6 +13,11 @@ categories = ["web-programming", "wasm"]
 keywords = ["websocket", "websockets", "portable", "native", "web"]
 include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 
+[package.metadata.docs.rs]
+all-features = true
+targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+
+
 [features]
 default = ["with_tungstenite"]
 tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
@@ -24,6 +29,7 @@ with_tungstenite = [
   "tokio",
   "tungstenite",
 ]
+
 
 [dependencies]
 tracing = "0.1"

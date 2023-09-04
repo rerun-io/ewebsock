@@ -26,7 +26,7 @@ impl WsSender {
 
 /// Call the given event handler on each new received event.
 ///
-/// This is a more advanced version of [`connect`].
+/// This is a more advanced version of [`crate::connect`].
 ///
 /// # Errors
 /// * On native: never.

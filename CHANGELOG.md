@@ -1,8 +1,9 @@
-## Unreleased
-* Fix: `WsEvent::Closed` is correctly sent on web when socket is closed.
-* Fix: On web, close connection when dropping `WsSender`.
+## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
+* Fix: `WsEvent::Closed` is correctly sent on web when socket is closed (#6)
+* Fix: On web, close connection when dropping `WsSender` (#8)
 
-## 0.2.0 - 2022-04-08
+
+## [0.2.0]](https://github.com/rerun-io/ewebsock/compare/0.1.0...0.2.0) - 2022-04-08
 * Support WSS (WebSocket Secure) / TLS.
 * Improve error reporting.
 * `EventHandler` no longer needs to be `Sync`.

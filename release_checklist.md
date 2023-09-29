@@ -5,7 +5,8 @@
 - [ ] `git commit -m 'Release 0.x.0 - summary'`
 - [ ] `(cd ewebsock && cargo publish)`
 - [ ] `git tag -a 0.x.0 -m 'Release 0.x.0 - summary'`
-- [ ] `git push && git push --tags`
+* [ ] `git pull --tags && git tag -d latest && git tag -a latest -m 'Latest release' && git push --tags origin latest --force`
+* [ ] `git push && git push --tags`
 - [ ] Check that CI is green
 - [ ] Do a GitHub release: https://github.com/emilk/rerun-io/ewebsock/new
 - [ ] Post on Twitter

@@ -47,8 +47,8 @@ futures-util = { version = "0.3", default-features = false, features = [
   "std",
 ], optional = true }
 tokio = { version = "1.16", features = ["rt", "sync"], optional = true }
-tokio-tungstenite = { version = "0.20", optional = true }
-tungstenite = { version = "0.20", optional = true }
+tokio-tungstenite = { version = ">=0.17, <=0.20", optional = true }
+tungstenite = { version = ">=0.17, <=0.20", optional = true }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]

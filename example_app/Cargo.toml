@@ -6,6 +6,7 @@ edition = "2021"
 rust-version = "1.56"
 license = "MIT OR Apache-2.0"
 include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
+publish = false
 
 
 [lib]

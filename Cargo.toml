@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["ewebsock", "example_app"]
+members = ["ewebsock", "example_app", "echo_server"]
 
 [patch.crates-io]
 # If you want to use the bleeding edge version of egui/eframe:

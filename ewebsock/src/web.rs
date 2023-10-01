@@ -21,7 +21,7 @@ pub struct WsSender {
 impl Drop for WsSender {
     fn drop(&mut self) {
         if let Err(err) = self.ws.close() {
-            tracing::warn!("Failed to close web-socket: {:?}", err);
+            log::warn!("Failed to close web-socket: {:?}", err);
         }
     }
 }
@@ -40,7 +40,7 @@ impl WsSender {
             }
         };
         if let Err(err) = result.map_err(string_from_js_value) {
-            tracing::error!("Failed to send: {:?}", err);
+            log::error!("Failed to send: {:?}", err);
         }
     }
 }
@@ -98,7 +98,7 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
                     txt,
                 ))));
             } else {
-                tracing::debug!("Unknown websocket message received: {:?}", e.data());
+                log::debug!("Unknown websocket message received: {:?}", e.data());
                 on_event(WsEvent::Message(WsMessage::Unknown(string_from_js_value(
                     e.data(),
                 ))));
@@ -115,7 +115,7 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     {
         let on_event = on_event.clone();
         let onerror_callback = Closure::wrap(Box::new(move |error_event: web_sys::ErrorEvent| {
-            tracing::error!(
+            log::error!(
                 "error event: {}: {:?}",
                 error_event.message(),
                 error_event.error()

@@ -32,7 +32,7 @@ async fn ws_connect_async(
         }
     };
 
-    tracing::info!("WebSocket handshake has been successfully completed");
+    log::info!("WebSocket handshake has been successfully completed");
     on_event(WsEvent::Opened);
 
     let (write, read) = ws_stream.split();
@@ -98,12 +98,12 @@ pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
         while let Some(item) = rx.recv().await {
             yield item;
         }
-        tracing::debug!("WsSender dropped - closing connection.");
+        log::debug!("WsSender dropped - closing connection.");
     };
 
     tokio::spawn(async move {
         ws_connect_async(url.clone(), outgoing_messages_stream, on_event).await;
-        tracing::debug!("WS connection finished.");
+        log::debug!("WS connection finished.");
     });
     WsSender { tx }
 }

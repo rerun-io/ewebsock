@@ -36,8 +36,6 @@ tracing = "0.1"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-# Feature "websocket":
-# websocket = {version = "0.26", optional = true } # not so up-to-date, and uses openssl :(
 
 # Feature "tungstenite":
 async-stream = { version = "0.3", optional = true }

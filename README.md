@@ -21,13 +21,18 @@ while let Some(event) = receiver.try_recv() {
 ```
 
 ## Testing
-Locally:
+First start the example echo server with:
+```sh
+cargo r -p echo_server
+```
+
+Then test the native library with:
 
 ```sh
 cargo run -p example_app
 ```
 
-Web:
+And the web library with:
 ```sh
 ./example_app/start_server.sh &
 ./example_app/build_web.sh --open

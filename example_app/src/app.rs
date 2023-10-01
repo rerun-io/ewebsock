@@ -1,11 +1,20 @@
 use eframe::egui;
 use ewebsock::{WsEvent, WsMessage, WsReceiver, WsSender};
 
-#[derive(Default)]
 pub struct ExampleApp {
     url: String,
     error: String,
     frontend: Option<FrontEnd>,
+}
+
+impl Default for ExampleApp {
+    fn default() -> Self {
+        Self {
+            url: "ws://127.0.0.1:9001".to_owned(),
+            error: Default::default(),
+            frontend: None,
+        }
+    }
 }
 
 impl eframe::App for ExampleApp {

@@ -12,21 +12,12 @@
 #![warn(missing_docs)] // let's keep ewebsock well-documented
 
 #[cfg(not(target_arch = "wasm32"))]
-#[cfg(feature = "websocket")]
-mod native_websocket;
-
-#[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "with_tungstenite")]
 mod native_tungstenite;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "with_tungstenite")]
 pub use native_tungstenite::*;
-
-#[cfg(not(target_arch = "wasm32"))]
-#[cfg(feature = "websocket")]
-#[cfg(not(feature = "with_tungstenite"))]
-pub use native_websocket::*;
 
 #[cfg(target_arch = "wasm32")]
 mod web;

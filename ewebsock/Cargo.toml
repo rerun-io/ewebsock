@@ -19,15 +19,21 @@ targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 
 
 [features]
-default = ["with_tungstenite"]
-tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
-with_tungstenite = [
-  "async-stream",
-  "futures-util",
-  "futures",
-  "tokio-tungstenite",
-  "tokio",
-  "tungstenite",
+default = []
+
+tls = ["tungstenite/rustls-tls-webpki-roots"]
+
+## Opt-in to the tokio executor.
+##
+## This adds a lot of dependencies,
+## but may yield lower latency and CPU usage
+## when using `ws_connect`.
+tokio = [
+  "dep:async-stream",
+  "dep:futures",
+  "dep:futures-util",
+  "dep:tokio",
+  "dep:tokio-tungstenite",
 ]
 
 
@@ -36,17 +42,17 @@ log = "0.4"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tungstenite = { version = ">=0.17, <=0.20" }
 
-# Feature "tungstenite":
+# Optional dependencies for feature "tokio":
 async-stream = { version = "0.3", optional = true }
 futures = { version = "0.3", optional = true }
-futures-util = { version = "0.3", default-features = false, features = [
+futures-util = { version = "0.3", optional = true, default-features = false, features = [
   "sink",
   "std",
-], optional = true }
+] }
 tokio = { version = "1.16", features = ["rt", "sync"], optional = true }
 tokio-tungstenite = { version = ">=0.17, <=0.20", optional = true }
-tungstenite = { version = ">=0.17, <=0.20", optional = true }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]

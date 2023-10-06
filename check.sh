@@ -3,6 +3,7 @@
 set -eux
 
 cargo check --workspace --all-targets
+cargo check --workspace --all-targets --all-features
 cargo check -p example_app --all-features --lib --target wasm32-unknown-unknown
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features --  -D warnings -W clippy::all

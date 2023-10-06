@@ -12,12 +12,20 @@
 #![warn(missing_docs)] // let's keep ewebsock well-documented
 
 #[cfg(not(target_arch = "wasm32"))]
-#[cfg(feature = "with_tungstenite")]
+#[cfg(not(feature = "tokio"))]
 mod native_tungstenite;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[cfg(feature = "with_tungstenite")]
+#[cfg(not(feature = "tokio"))]
 pub use native_tungstenite::*;
+
+#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "tokio")]
+mod native_tungstenite_tokio;
+
+#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "tokio")]
+pub use native_tungstenite_tokio::*;
 
 #[cfg(target_arch = "wasm32")]
 mod web;

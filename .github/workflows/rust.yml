@@ -49,6 +49,11 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
+
+      - name: Check --all-features
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
           args: --all-features
 
       - name: Test doc-tests

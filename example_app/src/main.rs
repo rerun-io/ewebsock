@@ -2,11 +2,20 @@
 #![cfg_attr(not(debug_assertions), deny(warnings))] // Forbid warnings in release builds
 #![warn(clippy::all, rust_2018_idioms)]
 
-// When compiling natively:
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "tokio")]
 #[tokio::main]
 async fn main() -> eframe::Result<()> {
-    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+    main_impl()
+}
+
+#[cfg(not(feature = "tokio"))]
+fn main() -> eframe::Result<()> {
+    main_impl()
+}
+
+fn main_impl() -> Result<(), eframe::Error> {
+    env_logger::init();
+    // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let app = example_app::ExampleApp::default();
     let native_options = eframe::NativeOptions::default();

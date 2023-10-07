@@ -14,8 +14,7 @@ fn main() -> eframe::Result<()> {
 }
 
 fn main_impl() -> Result<(), eframe::Error> {
-    env_logger::init();
-    // Log to stderr (if you run with `RUST_LOG=debug`).
+    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
     let app = example_app::ExampleApp::default();
     let native_options = eframe::NativeOptions::default();

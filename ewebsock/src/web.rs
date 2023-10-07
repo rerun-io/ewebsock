@@ -12,16 +12,15 @@ fn string_from_js_string(s: js_sys::JsString) -> String {
 
 /// This is how you send messages to the server.
 ///
-/// When the last clone of this is dropped, the connection is closed.
-#[derive(Clone)]
+/// When this is dropped, the connection is closed.
 pub struct WsSender {
-    ws: web_sys::WebSocket,
+    ws: Option<web_sys::WebSocket>,
 }
 
 impl Drop for WsSender {
     fn drop(&mut self) {
-        if let Err(err) = self.ws.close() {
-            log::warn!("Failed to close web-socket: {:?}", err);
+        if let Err(err) = self.close() {
+            log::warn!("Failed to close WebSocket: {err:?}");
         }
     }
 }
@@ -29,31 +28,46 @@ impl Drop for WsSender {
 impl WsSender {
     /// Send the message to the server.
     pub fn send(&mut self, msg: WsMessage) {
-        let result = match msg {
-            WsMessage::Binary(data) => {
-                self.ws.set_binary_type(web_sys::BinaryType::Blob);
-                self.ws.send_with_u8_array(&data)
+        if let Some(ws) = &mut self.ws {
+            let result = match msg {
+                WsMessage::Binary(data) => {
+                    ws.set_binary_type(web_sys::BinaryType::Blob);
+                    ws.send_with_u8_array(&data)
+                }
+                WsMessage::Text(text) => ws.send_with_str(&text),
+                unknown => {
+                    panic!("Don't know how to send message: {:?}", unknown);
+                }
+            };
+            if let Err(err) = result.map_err(string_from_js_value) {
+                log::error!("Failed to send: {:?}", err);
             }
-            WsMessage::Text(text) => self.ws.send_with_str(&text),
-            unknown => {
-                panic!("Don't know how to send message: {:?}", unknown);
-            }
-        };
-        if let Err(err) = result.map_err(string_from_js_value) {
-            log::error!("Failed to send: {:?}", err);
         }
+    }
+
+    /// Close the conenction.
+    ///
+    /// This is called automatically when the sender is dropped.
+    pub fn close(&mut self) -> Result<()> {
+        if let Some(ws) = self.ws.take() {
+            log::debug!("Closing WebSocket");
+            ws.close().map_err(string_from_js_value)
+        } else {
+            Ok(())
+        }
+    }
+
+    /// Forget about this sender without closing the connection.
+    pub fn forget(mut self) {
+        self.ws = None;
     }
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is a more advanced version of [`crate::connect`].
-///
-/// # Errors
-/// * On native: never.
-/// * On web: failure to use `WebSocket` API.
-#[allow(clippy::needless_pass_by_value)]
-pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
+    ws_connect_impl(url, on_event).map(|sender| sender.forget())
+}
+
+pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
 
     use wasm_bindgen::closure::Closure;
@@ -143,5 +157,5 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
         onclose_callback.forget();
     }
 
-    Ok(WsSender { ws })
+    Ok(WsSender { ws: Some(ws) })
 }

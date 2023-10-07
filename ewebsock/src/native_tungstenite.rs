@@ -156,6 +156,11 @@ pub fn ws_connect_blocking(
 
     match socket.get_mut() {
         tungstenite::stream::MaybeTlsStream::Plain(stream) => stream.set_nonblocking(true),
+
+        // tungstenite::stream::MaybeTlsStream::NativeTls(stream) => {
+        //     stream.get_mut().set_nonblocking(true)
+        // }
+        #[cfg(feature = "tls")]
         tungstenite::stream::MaybeTlsStream::Rustls(stream) => {
             stream.get_mut().set_nonblocking(true)
         }

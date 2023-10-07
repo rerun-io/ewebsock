@@ -101,19 +101,12 @@ async fn ws_connect_async(
     futures_util::future::select(reader, writer).await;
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is a more advanced version of [`crate::connect`].
-///
-/// # Errors
-/// * On native: never.
-/// * On web: failure to use `WebSocket` API.
-pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
     Ok(ws_connect_native(url, on_event))
 }
 
 /// Like [`ws_connect`], but cannot fail. Only available on native builds.
-pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
+fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 
     let outgoing_messages_stream = async_stream::stream! {
@@ -128,4 +121,8 @@ pub fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
         log::debug!("WS connection finished.");
     });
     WsSender { tx: Some(tx) }
+}
+
+pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
+    ws_connect_impl(url, on_event).map(|sender| sender.forget())
 }

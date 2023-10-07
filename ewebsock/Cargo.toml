@@ -38,6 +38,7 @@ tokio = [
 
 
 [dependencies]
+document-features = "0.2"
 log = "0.4"
 
 # native:

@@ -41,15 +41,7 @@ impl WsSender {
     }
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is like [`ws_connect`], but it doesn't return a [`WsSender`],
-/// so it can only receive messages, not send them.
-///
-/// # Errors
-/// * On native: failure to spawn receiver thread.
-/// * On web: failure to use `WebSocket` API.
-pub fn ws_receive(url: String, on_event: EventHandler) -> Result<()> {
+pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
     std::thread::Builder::new()
         .name("ewebsock".to_owned())
         .spawn(move || {
@@ -64,7 +56,7 @@ pub fn ws_receive(url: String, on_event: EventHandler) -> Result<()> {
     Ok(())
 }
 
-/// Call the given event handler on each new received event.
+/// Connect and call the given event handler on each received event.
 ///
 /// Blocking version of [`ws_receive`], only avilable on native.
 ///
@@ -119,14 +111,7 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     }
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is a more advanced version of [`crate::connect`].
-///
-/// # Errors
-/// * On native: failure to spawn handler thread.
-/// * On web: failure to use `WebSocket` API.
-pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
     let (tx, rx) = std::sync::mpsc::channel();
 
     std::thread::Builder::new()
@@ -143,10 +128,9 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
     Ok(WsSender { tx: Some(tx) })
 }
 
-/// Call the given event handler on each new received event.
+/// Connect and call the given event handler on each received event.
 ///
-/// This is a blocking variant of [`Self::ws_connect`],
-/// only availble on native.
+/// This is a blocking variant of [`ws_connect`], only availble on native.
 ///
 /// # Errors
 /// * Any connection failures

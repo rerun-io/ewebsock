@@ -8,6 +8,10 @@
 //!     println!("Received {:?}", event);
 //! }
 //! ```
+//!
+//! ## Feature flags
+#![doc = document_features::document_features!()]
+//!
 
 #![warn(missing_docs)] // let's keep ewebsock well-documented
 
@@ -115,8 +119,10 @@ pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFl
 
 /// Connect to the given URL, and return a sender and receiver.
 ///
+/// This is a wrapper around [`ws_connect`].
+///
 /// # Errors
-/// * On native: never.
+/// * On native: failure to spawn a thread.
 /// * On web: failure to use `WebSocket` API.
 ///
 /// See also the [`connect_with_wakeup`] function,
@@ -131,8 +137,10 @@ pub fn connect(url: impl Into<String>) -> Result<(WsSender, WsReceiver)> {
 ///
 /// This allows you to wake up the UI thread, for instance.
 ///
+/// This is a wrapper around [`ws_connect`].
+///
 /// # Errors
-/// * On native: never.
+/// * On native: failure to spawn a thread.
 /// * On web: failure to use `WebSocket` API.
 ///
 /// Note that you have to wait for [`WsEvent::Opened`] before sending messages.
@@ -143,4 +151,29 @@ pub fn connect_with_wakeup(
     let (receiver, on_event) = WsReceiver::new_with_callback(wake_up);
     let sender = ws_connect(url.into(), on_event)?;
     Ok((sender, receiver))
+}
+
+/// Connect and call the given event handler on each received event.
+///
+/// See [`crate::connect`] for a more high-level version.
+///
+/// # Errors
+/// * On native: failure to spawn a thread.
+/// * On web: failure to use `WebSocket` API.
+pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
+    ws_connect_impl(url, on_event)
+}
+
+/// Connect and call the given event handler on each received event.
+///
+/// This is like [`ws_connect`], but it doesn't return a [`WsSender`],
+/// so it can only receive messages, not send them.
+///
+/// This can be slightly more efficent when you don't need to send messages.
+///
+/// # Errors
+/// * On native: failure to spawn receiver thread.
+/// * On web: failure to use `WebSocket` API.
+pub fn ws_receive(url: String, on_event: EventHandler) -> Result<()> {
+    ws_receive_impl(url, on_event)
 }

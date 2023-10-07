@@ -62,27 +62,11 @@ impl WsSender {
     }
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is like [`ws_connect`], but it doesn't return a [`WsSender`],
-/// so it can only receive messages, not send them.
-///
-/// # Errors
-/// * On native: failure to spawn receiver thread.
-/// * On web: failure to use `WebSocket` API.
-pub fn ws_receive(url: String, on_event: EventHandler) -> Result<()> {
-    ws_connect(url, on_event).map(|sender| sender.forget())
+pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
+    ws_connect_impl(url, on_event).map(|sender| sender.forget())
 }
 
-/// Call the given event handler on each new received event.
-///
-/// This is a more advanced version of [`crate::connect`].
-///
-/// # Errors
-/// * On native: never.
-/// * On web: failure to use `WebSocket` API.
-#[allow(clippy::needless_pass_by_value)]
-pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
 
     use wasm_bindgen::closure::Closure;

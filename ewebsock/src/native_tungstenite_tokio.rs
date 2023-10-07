@@ -104,6 +104,7 @@ async fn ws_connect_async(
     futures_util::future::select(reader, writer).await;
 }
 
+#[allow(clippy::unnecessary_wraps)]
 pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
     Ok(ws_connect_native(url, on_event))
 }

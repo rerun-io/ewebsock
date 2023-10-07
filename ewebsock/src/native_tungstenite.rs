@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
+
 use std::sync::mpsc::{Receiver, TryRecvError};
 
 use crate::{EventHandler, Result, WsEvent, WsMessage};

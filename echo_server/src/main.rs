@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
+
 use std::{net::TcpListener, thread::spawn};
 
 fn main() {

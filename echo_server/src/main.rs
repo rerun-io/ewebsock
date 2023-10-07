@@ -9,11 +9,11 @@ fn main() {
             let mut websocket = tungstenite::accept(stream.unwrap()).unwrap();
             eprintln!("New client connected");
             loop {
-                let msg = websocket.read().unwrap();
+                let msg = websocket.read_message().unwrap();
 
                 // We do not want to send back ping/pong messages.
                 if msg.is_binary() || msg.is_text() {
-                    websocket.send(msg).unwrap();
+                    websocket.write_message(msg).unwrap();
                     eprintln!("Responded.");
                 }
             }

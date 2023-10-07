@@ -10,4 +10,4 @@ publish = false
 
 
 [dependencies]
-tungstenite = "0.20"
+tungstenite = { version = ">=0.17, <=0.20" }

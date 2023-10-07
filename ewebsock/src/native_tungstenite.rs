@@ -79,7 +79,7 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     on_event(WsEvent::Opened);
 
     loop {
-        match socket.read() {
+        match socket.read_message() {
             Ok(incoming_msg) => match incoming_msg {
                 tungstenite::protocol::Message::Text(text) => {
                     on_event(WsEvent::Message(WsMessage::Text(text)));
@@ -181,22 +181,22 @@ pub fn ws_connect_blocking(
                     WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data),
                     WsMessage::Unknown(_) => panic!("You cannot send WsMessage::Unknown"),
                 };
-                if let Err(err) = socket.send(outgoing_message) {
+                if let Err(err) = socket.write_message(outgoing_message) {
                     socket.close(None).ok();
-                    socket.flush().ok();
+                    socket.write_pending().ok();
                     return Err(format!("send: {err}"));
                 }
             }
             Err(TryRecvError::Disconnected) => {
                 log::debug!("WsSender dropped - closing connection.");
                 socket.close(None).ok();
-                socket.flush().ok();
+                socket.write_pending().ok();
                 return Ok(());
             }
             Err(TryRecvError::Empty) => {}
         };
 
-        match socket.read() {
+        match socket.read_message() {
             Ok(incoming_msg) => {
                 did_work = true;
                 match incoming_msg {

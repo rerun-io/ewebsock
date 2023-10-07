@@ -20,7 +20,7 @@ pub struct WsSender {
 impl Drop for WsSender {
     fn drop(&mut self) {
         if let Err(err) = self.close() {
-            log::warn!("Failed to close web-socket: {err:?}");
+            log::warn!("Failed to close WebSocket: {err:?}");
         }
     }
 }
@@ -50,6 +50,7 @@ impl WsSender {
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {
         if let Some(ws) = self.ws.take() {
+            log::debug!("Closing WebSocket");
             ws.close().map_err(string_from_js_value)
         } else {
             Ok(())

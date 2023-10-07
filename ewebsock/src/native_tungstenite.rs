@@ -31,6 +31,9 @@ impl WsSender {
     ///
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {
+        if self.tx.is_some() {
+            log::debug!("Closing WebSocket");
+        }
         self.tx = None;
         Ok(())
     }

@@ -71,6 +71,8 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     let (mut socket, response) = match tungstenite::connect(url) {
         Ok(result) => result,
         Err(err) => {
+            let msg = format!("Connect: {err}");
+            on_event(WsEvent::Error(msg));
             return Err(err.to_string());
         }
     };

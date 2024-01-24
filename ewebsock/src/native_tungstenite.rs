@@ -122,7 +122,6 @@ pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsS
         .name("ewebsock".to_owned())
         .spawn(move || {
             if let Err(err) = ws_connect_blocking(&url, &on_event, &rx) {
-                log::error!("WebSocket error: {err}. Connection closed.");
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");

@@ -51,7 +51,7 @@ pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()>
         .name("ewebsock".to_owned())
         .spawn(move || {
             if let Err(err) = ws_receiver_blocking(&url, &on_event) {
-                log::error!("WebSocket error: {err}. Connection closed.");
+                on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
             }
@@ -71,7 +71,7 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     let (mut socket, response) = match tungstenite::connect(url) {
         Ok(result) => result,
         Err(err) => {
-            return Err(err.to_string());
+            return Err(format!("Connect: {err}"));
         }
     };
 
@@ -107,7 +107,6 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
             },
             Err(err) => {
                 let msg = format!("read: {err}");
-                on_event(WsEvent::Error(msg.clone()));
                 return Err(msg);
             }
         }
@@ -123,7 +122,7 @@ pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsS
         .name("ewebsock".to_owned())
         .spawn(move || {
             if let Err(err) = ws_connect_blocking(&url, &on_event, &rx) {
-                log::error!("WebSocket error: {err}. Connection closed.");
+                on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
             }
@@ -147,7 +146,7 @@ pub fn ws_connect_blocking(
     let (mut socket, response) = match tungstenite::connect(url) {
         Ok(result) => result,
         Err(err) => {
-            return Err(err.to_string());
+            return Err(format!("Connect: {err}"));
         }
     };
 
@@ -232,7 +231,6 @@ pub fn ws_connect_blocking(
             }
             Err(err) => {
                 let msg = format!("read: {err}");
-                on_event(WsEvent::Error(msg.clone()));
                 return Err(msg);
             }
         }

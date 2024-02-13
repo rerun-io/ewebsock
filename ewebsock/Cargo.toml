@@ -39,11 +39,12 @@ tokio = [
 
 [dependencies]
 document-features = "0.2"
+http = "1.0.0"
 log = "0.4"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tungstenite = { version = ">=0.17, <=0.20" }
+tungstenite = { path = "../../tungstenite-rs" }
 
 # Optional dependencies for feature "tokio":
 async-stream = { version = "0.3", optional = true }

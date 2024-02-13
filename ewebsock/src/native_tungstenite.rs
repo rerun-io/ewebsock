@@ -1,8 +1,7 @@
 #![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
 
-use std::sync::mpsc::{Receiver, TryRecvError};
-
 use crate::{EventHandler, Result, WsEvent, WsMessage};
+use std::sync::mpsc::{Receiver, TryRecvError};
 
 /// This is how you send [`WsMessage`]s to the server.
 ///
@@ -68,7 +67,9 @@ pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()>
 /// # Errors
 /// * Any connection failures
 pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
-    let (mut socket, response) = match tungstenite::connect(url) {
+    let uri: http::Uri = url.parse().unwrap();
+    let builder = tungstenite::ClientRequestBuilder::new(uri).with_header("Origin", url);
+    let (mut socket, response) = match tungstenite::connect(builder) {
         Ok(result) => result,
         Err(err) => {
             return Err(format!("Connect: {err}"));
@@ -143,7 +144,9 @@ pub fn ws_connect_blocking(
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
-    let (mut socket, response) = match tungstenite::connect(url) {
+    let uri: http::Uri = url.parse().unwrap();
+    let builder = tungstenite::ClientRequestBuilder::new(uri).with_header("Origin", url);
+    let (mut socket, response) = match tungstenite::connect(builder) {
         Ok(result) => result,
         Err(err) => {
             return Err(format!("Connect: {err}"));

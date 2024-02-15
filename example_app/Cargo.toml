@@ -23,7 +23,7 @@ tokio = ["ewebsock/tokio", "dep:tokio"]
 [dependencies]
 ewebsock = { path = "../ewebsock", features = ["tls"] }
 
-eframe = "0.22.0" # Gives us egui, epi and web+native backends
+eframe = "0.26.2" # Gives us egui, epi and web+native backends
 log = "0.4"
 
 # native:

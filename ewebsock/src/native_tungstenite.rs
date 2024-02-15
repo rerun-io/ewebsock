@@ -42,6 +42,7 @@ impl WsSender {
 
     /// Forget about this sender without closing the connection.
     pub fn forget(mut self) {
+        #[allow(clippy::mem_forget)] // intentional
         std::mem::forget(self.tx.take());
     }
 }

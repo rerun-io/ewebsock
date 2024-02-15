@@ -67,7 +67,7 @@ pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()>
 /// Blocking version of [`ws_receive`], only avilable on native.
 ///
 /// # Errors
-/// * Any connection failures
+/// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     let (mut socket, response) = match tungstenite::connect(url) {
         Ok(result) => result,
@@ -107,8 +107,7 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
                 tungstenite::protocol::Message::Frame(_) => {}
             },
             Err(err) => {
-                let msg = format!("read: {err}");
-                return Err(msg);
+                return Err(format!("read: {err}"));
             }
         }
 
@@ -138,7 +137,7 @@ pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsS
 /// This is a blocking variant of [`ws_connect`], only availble on native.
 ///
 /// # Errors
-/// * Any connection failures
+/// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_connect_blocking(
     url: &str,
     on_event: &EventHandler,
@@ -231,8 +230,7 @@ pub fn ws_connect_blocking(
                 // Ignore
             }
             Err(err) => {
-                let msg = format!("read: {err}");
-                return Err(msg);
+                return Err(format!("read: {err}"));
             }
         }
 

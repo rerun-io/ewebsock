@@ -1,6 +1,6 @@
 [package]
 name = "ewebsock"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 description = "WebSocket client that works natively and on the web (WASM)"
 edition = "2021"

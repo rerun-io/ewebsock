@@ -61,7 +61,7 @@ impl eframe::App for ExampleApp {
 impl ExampleApp {
     fn connect(&mut self, ctx: egui::Context) {
         let wakeup = move || ctx.request_repaint(); // wake up UI thread on new message
-        match ewebsock::connect_with_wakeup(&self.url, wakeup) {
+        match ewebsock::connect_with_wakeup(&self.url, Default::default(), wakeup) {
             Ok((ws_sender, ws_receiver)) => {
                 self.frontend = Some(FrontEnd::new(ws_sender, ws_receiver));
                 self.error.clear();

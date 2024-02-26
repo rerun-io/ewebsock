@@ -2,7 +2,7 @@
 
 use std::sync::mpsc::{Receiver, TryRecvError};
 
-use crate::{EventHandler, Result, WsEvent, WsMessage};
+use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
 ///
@@ -47,11 +47,11 @@ impl WsSender {
     }
 }
 
-pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
+pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHandler) -> Result<()> {
     std::thread::Builder::new()
         .name("ewebsock".to_owned())
         .spawn(move || {
-            if let Err(err) = ws_receiver_blocking(&url, &on_event) {
+            if let Err(err) = ws_receiver_blocking(&url, options, &on_event) {
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -64,17 +64,21 @@ pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()>
 
 /// Connect and call the given event handler on each received event.
 ///
-/// Blocking version of [`ws_receive`], only avilable on native.
+/// Blocking version of [`ws_receive`], only available on native.
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
-pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
-    let (mut socket, response) = match tungstenite::connect(url) {
-        Ok(result) => result,
-        Err(err) => {
-            return Err(format!("Connect: {err}"));
-        }
-    };
+pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
+    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let max_redirects = 3; // tungstenite default
+
+    let (mut socket, response) =
+        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
+            Ok(result) => result,
+            Err(err) => {
+                return Err(format!("Connect: {err}"));
+            }
+        };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(
@@ -115,13 +119,17 @@ pub fn ws_receiver_blocking(url: &str, on_event: &EventHandler) -> Result<()> {
     }
 }
 
-pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_connect_impl(
+    url: String,
+    options: Options,
+    on_event: EventHandler,
+) -> Result<WsSender> {
     let (tx, rx) = std::sync::mpsc::channel();
 
     std::thread::Builder::new()
         .name("ewebsock".to_owned())
         .spawn(move || {
-            if let Err(err) = ws_connect_blocking(&url, &on_event, &rx) {
+            if let Err(err) = ws_connect_blocking(&url, options, &on_event, &rx) {
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -140,15 +148,19 @@ pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsS
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_connect_blocking(
     url: &str,
+    options: Options,
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
-    let (mut socket, response) = match tungstenite::connect(url) {
-        Ok(result) => result,
-        Err(err) => {
-            return Err(format!("Connect: {err}"));
-        }
-    };
+    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let max_redirects = 3; // tungstenite default
+    let (mut socket, response) =
+        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
+            Ok(result) => result,
+            Err(err) => {
+                return Err(format!("Connect: {err}"));
+            }
+        };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(

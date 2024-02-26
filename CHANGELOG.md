@@ -1,7 +1,11 @@
 ## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
 
 
-## [0.4.1](https://github.com/rerun-io/ewebsock/compare/0.4.0...0.4.1) - 2023-10-07
+## [0.5.0]((https://github.com/rerun-io/ewebsock/compare/0.4.1...0.5.0) - 2024-02-26
+* Add `Options` for controlling max frame size of incoming messages - ([#29](https://github.com/rerun-io/ewebsock/pull/29))
+
+
+## [0.4.1](https://github.com/rerun-io/ewebsock/compare/0.4.0...0.4.1) - 2024-02-15
 * Fix: all errors are reported to the caller via `on_event` ([#26](https://github.com/rerun-io/ewebsock/pull/26))
 * Add support for tungstenite 0.21, update MSRV to 1.72 ([#28](https://github.com/rerun-io/ewebsock/pull/28))
 

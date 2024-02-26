@@ -1,4 +1,4 @@
-use crate::{EventHandler, Result, WsEvent, WsMessage};
+use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
 ///
@@ -25,7 +25,7 @@ impl WsSender {
         }
     }
 
-    /// Close the conenction.
+    /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {
@@ -45,12 +45,21 @@ impl WsSender {
 
 async fn ws_connect_async(
     url: String,
+    options: Options,
     outgoing_messages_stream: impl futures::Stream<Item = WsMessage>,
     on_event: EventHandler,
 ) {
     use futures::StreamExt as _;
 
-    let (ws_stream, _) = match tokio_tungstenite::connect_async(url).await {
+    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let disable_nagle = false; // God damn everyone who adds negations to the names of their variables
+    let (ws_stream, _) = match tokio_tungstenite::connect_async_with_config(
+        url,
+        Some(config),
+        disable_nagle,
+    )
+    .await
+    {
         Ok(result) => result,
         Err(err) => {
             on_event(WsEvent::Error(err.to_string()));
@@ -106,12 +115,16 @@ async fn ws_connect_async(
 }
 
 #[allow(clippy::unnecessary_wraps)]
-pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
-    Ok(ws_connect_native(url, on_event))
+pub(crate) fn ws_connect_impl(
+    url: String,
+    options: Options,
+    on_event: EventHandler,
+) -> Result<WsSender> {
+    Ok(ws_connect_native(url, options, on_event))
 }
 
 /// Like [`ws_connect`], but cannot fail. Only available on native builds.
-fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
+fn ws_connect_native(url: String, options: Options, on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 
     let outgoing_messages_stream = async_stream::stream! {
@@ -122,12 +135,12 @@ fn ws_connect_native(url: String, on_event: EventHandler) -> WsSender {
     };
 
     tokio::spawn(async move {
-        ws_connect_async(url.clone(), outgoing_messages_stream, on_event).await;
+        ws_connect_async(url.clone(), options, outgoing_messages_stream, on_event).await;
         log::debug!("WS connection finished.");
     });
     WsSender { tx: Some(tx) }
 }
 
-pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
-    ws_connect_impl(url, on_event).map(|sender| sender.forget())
+pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHandler) -> Result<()> {
+    ws_connect_impl(url, options, on_event).map(|sender| sender.forget())
 }

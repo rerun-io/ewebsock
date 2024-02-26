@@ -1,0 +1,9 @@
+# https://github.com/crate-ci/typos
+# install:  cargo install typos-cli
+# run:      typos
+
+[files]
+extend-exclude = [".typos.toml", "docs/example_app.js"]
+
+
+[default.extend-words]

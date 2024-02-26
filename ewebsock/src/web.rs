@@ -1,4 +1,4 @@
-use crate::{EventHandler, Result, WsEvent, WsMessage};
+use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 #[allow(clippy::needless_pass_by_value)]
 fn string_from_js_value(s: wasm_bindgen::JsValue) -> String {
@@ -45,7 +45,7 @@ impl WsSender {
         }
     }
 
-    /// Close the conenction.
+    /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {
@@ -63,11 +63,15 @@ impl WsSender {
     }
 }
 
-pub(crate) fn ws_receive_impl(url: String, on_event: EventHandler) -> Result<()> {
-    ws_connect_impl(url, on_event).map(|sender| sender.forget())
+pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHandler) -> Result<()> {
+    ws_connect_impl(url, options, on_event).map(|sender| sender.forget())
 }
 
-pub(crate) fn ws_connect_impl(url: String, on_event: EventHandler) -> Result<WsSender> {
+pub(crate) fn ws_connect_impl(
+    url: String,
+    _ignored_options: Options,
+    on_event: EventHandler,
+) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
 
     use wasm_bindgen::closure::Closure;

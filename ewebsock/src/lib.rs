@@ -194,7 +194,7 @@ pub fn ws_connect(url: String, options: Options, on_event: EventHandler) -> Resu
 /// This is like [`ws_connect`], but it doesn't return a [`WsSender`],
 /// so it can only receive messages, not send them.
 ///
-/// This can be slightly more efficent when you don't need to send messages.
+/// This can be slightly more efficient when you don't need to send messages.
 ///
 /// # Errors
 /// * On native: failure to spawn receiver thread.

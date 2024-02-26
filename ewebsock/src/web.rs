@@ -45,7 +45,7 @@ impl WsSender {
         }
     }
 
-    /// Close the conenction.
+    /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {

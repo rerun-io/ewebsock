@@ -29,7 +29,7 @@ impl WsSender {
         }
     }
 
-    /// Close the conenction.
+    /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
     pub fn close(&mut self) -> Result<()> {
@@ -142,7 +142,7 @@ pub(crate) fn ws_connect_impl(
 
 /// Connect and call the given event handler on each received event.
 ///
-/// This is a blocking variant of [`ws_connect`], only availble on native.
+/// This is a blocking variant of [`ws_connect`], only available on native.
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.

@@ -2,6 +2,9 @@
 # This scripts runs various CI-like checks in a convenient way.
 set -eux
 
+cargo install --quiet typos-cli
+
+typos
 cargo check --quiet --workspace --all-targets
 cargo check --quiet --workspace --all-targets --all-features
 cargo check --quiet -p example_app --all-features --lib --target wasm32-unknown-unknown

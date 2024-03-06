@@ -47,7 +47,7 @@ async fn ws_connect_async(
     url: String,
     options: Options,
     outgoing_messages_stream: impl futures::Stream<Item = WsMessage>,
-    on_event: EventHandler,
+    mut on_event: EventHandler,
 ) {
     use futures::StreamExt as _;
 
@@ -118,13 +118,13 @@ async fn ws_connect_async(
 pub(crate) fn ws_connect_impl(
     url: String,
     options: Options,
-    on_event: EventHandler,
+    mut on_event: EventHandler,
 ) -> Result<WsSender> {
     Ok(ws_connect_native(url, options, on_event))
 }
 
 /// Like [`ws_connect`], but cannot fail. Only available on native builds.
-fn ws_connect_native(url: String, options: Options, on_event: EventHandler) -> WsSender {
+fn ws_connect_native(url: String, options: Options, mut on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 
     let outgoing_messages_stream = async_stream::stream! {

@@ -93,8 +93,8 @@ impl FrontEnd {
         }
     }
 
-    fn ui(&mut self, ctx: &egui::Context) {
-        while let Some(event) = self.ws_receiver.try_recv() {
+    async fn ui(&mut self, ctx: &egui::Context) {
+        while let Some(event) = self.ws_receiver.try_recv().await {
             self.events.push(event);
         }
 

@@ -123,7 +123,6 @@ pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFl
 
 /// Options for a connection.
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[non_exhaustive]
 pub struct Options {
     /// The maximum size of a single incoming message frame, in bytes.
     ///

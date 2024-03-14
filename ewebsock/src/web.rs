@@ -1,7 +1,9 @@
+use wasm_bindgen::prelude::*;
+
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 #[allow(clippy::needless_pass_by_value)]
-fn string_from_js_value(s: wasm_bindgen::JsValue) -> String {
+fn string_from_js_value(s: JsValue) -> String {
     s.as_string().unwrap_or(format!("{:#?}", s))
 }
 
@@ -69,16 +71,24 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 
 pub(crate) fn ws_connect_impl(
     url: String,
-    _ignored_options: Options,
+    options: Options,
     on_event: EventHandler,
 ) -> Result<WsSender> {
     // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
 
-    use wasm_bindgen::closure::Closure;
-    use wasm_bindgen::JsCast as _;
+    // Custom binding because `WebSocket::new_with_str_sequence` takes &JsValue??
+    #[wasm_bindgen]
+    extern "C" {
+        type WebSocket;
+
+        #[wasm_bindgen(catch, constructor, js_class = "WebSocket")]
+        fn connect(url: &str, protocols: Vec<String>) -> Result<WebSocket, JsValue>;
+    }
 
     // Connect to an server
-    let ws = web_sys::WebSocket::new(&url).map_err(string_from_js_value)?;
+    let ws = WebSocket::connect(&url, options.protocols)
+        .map_err(string_from_js_value)?
+        .unchecked_into::<web_sys::WebSocket>();
 
     // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling
     ws.set_binary_type(web_sys::BinaryType::Arraybuffer);

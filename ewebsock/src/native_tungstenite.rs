@@ -2,6 +2,7 @@
 
 use std::sync::mpsc::{Receiver, TryRecvError};
 
+use crate::tungstenite_common::tungstenite_options;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -69,11 +70,11 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let (config, request) = tungstenite_options(url, options);
     let max_redirects = 3; // tungstenite default
 
     let (mut socket, response) =
-        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
+        match tungstenite::client::connect_with_config(request, Some(config), max_redirects) {
             Ok(result) => result,
             Err(err) => {
                 return Err(format!("Connect: {err}"));
@@ -152,10 +153,11 @@ pub fn ws_connect_blocking(
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let (config, request) = tungstenite_options(url, options);
     let max_redirects = 3; // tungstenite default
+
     let (mut socket, response) =
-        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
+        match tungstenite::client::connect_with_config(request, Some(config), max_redirects) {
             Ok(result) => result,
             Err(err) => {
                 return Err(format!("Connect: {err}"));

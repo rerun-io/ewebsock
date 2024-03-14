@@ -117,12 +117,13 @@ impl WsReceiver {
 pub type Error = String;
 
 /// Short for `Result<T, ewebsock::Error>`.
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
 
 /// Options for a connection.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct Options {
     /// The maximum size of a single incoming message frame, in bytes.
     ///
@@ -131,12 +132,17 @@ pub struct Options {
     ///
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
+    /// The sub-protocols requested to the server.
+    ///
+    /// This is sent via the `Sec-WebSocket-Protocol` header.
+    pub protocols: Vec<String>,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
             max_incoming_frame_size: 64 * 1024 * 1024,
+            protocols: Vec::new(),
         }
     }
 }

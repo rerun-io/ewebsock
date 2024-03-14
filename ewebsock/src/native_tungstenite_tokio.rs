@@ -1,3 +1,4 @@
+use crate::tungstenite_common::tungstenite_options;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -51,21 +52,19 @@ async fn ws_connect_async(
 ) {
     use futures::StreamExt as _;
 
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let (config, request) = tungstenite_options(&url, options);
+
     let disable_nagle = false; // God damn everyone who adds negations to the names of their variables
-    let (ws_stream, _) = match tokio_tungstenite::connect_async_with_config(
-        url,
-        Some(config),
-        disable_nagle,
-    )
-    .await
-    {
-        Ok(result) => result,
-        Err(err) => {
-            on_event(WsEvent::Error(err.to_string()));
-            return;
-        }
-    };
+    let (ws_stream, _) =
+        match tokio_tungstenite::connect_async_with_config(request, Some(config), disable_nagle)
+            .await
+        {
+            Ok(result) => result,
+            Err(err) => {
+                on_event(WsEvent::Error(err.to_string()));
+                return;
+            }
+        };
 
     log::info!("WebSocket handshake has been successfully completed");
     on_event(WsEvent::Opened);

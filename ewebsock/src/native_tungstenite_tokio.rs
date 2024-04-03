@@ -1,3 +1,5 @@
+use std::ops::ControlFlow;
+
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -53,7 +55,7 @@ async fn ws_connect_async(
 
     let config = tungstenite::protocol::WebSocketConfig::from(options);
     let disable_nagle = false; // God damn everyone who adds negations to the names of their variables
-    let (ws_stream, _) = match tokio_tungstenite::connect_async_with_config(
+    let (ws_stream, _response) = match tokio_tungstenite::connect_async_with_config(
         url,
         Some(config),
         disable_nagle,
@@ -68,7 +70,9 @@ async fn ws_connect_async(
     };
 
     log::info!("WebSocket handshake has been successfully completed");
-    on_event(WsEvent::Opened);
+
+    let control = on_event(WsEvent::Opened);
+    // TODO: handle control.is_break()
 
     let (write, read) = ws_stream.split();
 
@@ -84,29 +88,26 @@ async fn ws_connect_async(
         .forward(write);
 
     let reader = read.for_each(move |event| {
-        match event {
+        let control = match event {
             Ok(message) => match message {
                 tungstenite::protocol::Message::Text(text) => {
-                    on_event(WsEvent::Message(WsMessage::Text(text)));
+                    on_event(WsEvent::Message(WsMessage::Text(text)))
                 }
                 tungstenite::protocol::Message::Binary(data) => {
-                    on_event(WsEvent::Message(WsMessage::Binary(data)));
+                    on_event(WsEvent::Message(WsMessage::Binary(data)))
                 }
                 tungstenite::protocol::Message::Ping(data) => {
-                    on_event(WsEvent::Message(WsMessage::Ping(data)));
+                    on_event(WsEvent::Message(WsMessage::Ping(data)))
                 }
                 tungstenite::protocol::Message::Pong(data) => {
-                    on_event(WsEvent::Message(WsMessage::Pong(data)));
+                    on_event(WsEvent::Message(WsMessage::Pong(data)))
                 }
-                tungstenite::protocol::Message::Close(_) => {
-                    on_event(WsEvent::Closed);
-                }
-                tungstenite::protocol::Message::Frame(_) => {}
+                tungstenite::protocol::Message::Close(_) => on_event(WsEvent::Closed),
+                tungstenite::protocol::Message::Frame(_) => ControlFlow::Continue(()),
             },
-            Err(err) => {
-                on_event(WsEvent::Error(err.to_string()));
-            }
+            Err(err) => on_event(WsEvent::Error(err.to_string())),
         };
+        // TODO: handle control.is_break()
         async {}
     });
 

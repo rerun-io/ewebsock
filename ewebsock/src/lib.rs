@@ -13,9 +13,9 @@
 //! ## Feature flags
 #![doc = document_features::document_features!()]
 //!
+//!
 
 #![warn(missing_docs)] // let's keep ewebsock well-documented
-
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(not(feature = "tokio"))]
 mod native_tungstenite;
@@ -40,6 +40,10 @@ mod web;
 
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
+
+use async_mutex::Mutex;
+use futures_channel::mpsc::{channel, Receiver, Sender};
+use futures_util::stream::StreamExt;
 
 // ----------------------------------------------------------------------------
 
@@ -81,7 +85,7 @@ pub enum WsEvent {
 
 /// Receiver for incoming [`WsEvent`]s.
 pub struct WsReceiver {
-    rx: std::sync::mpsc::Receiver<WsEvent>,
+    pub rx: Mutex<Receiver<WsEvent>>,
 }
 
 impl WsReceiver {
@@ -94,22 +98,29 @@ impl WsReceiver {
     ///
     /// This can be used to wake up the UI thread.
     pub fn new_with_callback(wake_up: impl Fn() + Send + Sync + 'static) -> (Self, EventHandler) {
-        let (tx, rx) = std::sync::mpsc::channel();
+        let (mut tx, rx) = channel(0);
+
         let on_event = Box::new(move |event| {
             wake_up(); // wake up UI thread
-            if tx.send(event).is_ok() {
+            if tx.try_send(event).is_ok() {
                 std::ops::ControlFlow::Continue(())
             } else {
                 std::ops::ControlFlow::Break(())
             }
         });
-        let ws_receiver = WsReceiver { rx };
+
+        let ws_receiver = WsReceiver { rx: Mutex::new(rx) };
         (ws_receiver, on_event)
     }
 
     /// Try receiving a new event without blocking.
-    pub fn try_recv(&self) -> Option<WsEvent> {
-        self.rx.try_recv().ok()
+    pub async fn try_recv(&self) -> Option<WsEvent> {
+        self.rx.lock().await.try_next().ok().flatten()
+    }
+
+    /// Get next message
+    pub async fn next(&mut self) -> std::option::Option<WsEvent> {
+        self.rx.lock().await.next().await
     }
 }
 
@@ -119,7 +130,7 @@ pub type Error = String;
 /// Short for `Result<T, ewebsock::Error>`.
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
+pub(crate) type EventHandler = Box<dyn Send + FnMut(WsEvent) -> std::ops::ControlFlow<()>>;
 
 /// Options for a connection.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

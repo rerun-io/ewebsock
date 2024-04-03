@@ -47,11 +47,15 @@ impl WsSender {
     }
 }
 
-pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHandler) -> Result<()> {
+pub(crate) fn ws_receive_impl(
+    url: String,
+    options: Options,
+    mut on_event: EventHandler,
+) -> Result<()> {
     std::thread::Builder::new()
         .name("ewebsock".to_owned())
         .spawn(move || {
-            if let Err(err) = ws_receiver_blocking(&url, options, &on_event) {
+            if let Err(err) = ws_receiver_blocking(&url, options, &mut on_event) {
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -68,7 +72,11 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
-pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
+pub fn ws_receiver_blocking(
+    url: &str,
+    options: Options,
+    on_event: &mut EventHandler,
+) -> Result<()> {
     let config = tungstenite::protocol::WebSocketConfig::from(options);
     let max_redirects = 3; // tungstenite default
 
@@ -122,14 +130,14 @@ pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler
 pub(crate) fn ws_connect_impl(
     url: String,
     options: Options,
-    on_event: EventHandler,
+    mut on_event: EventHandler,
 ) -> Result<WsSender> {
     let (tx, rx) = std::sync::mpsc::channel();
 
     std::thread::Builder::new()
         .name("ewebsock".to_owned())
         .spawn(move || {
-            if let Err(err) = ws_connect_blocking(&url, options, &on_event, &rx) {
+            if let Err(err) = ws_connect_blocking(&url, options, &mut on_event, &rx) {
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -149,7 +157,7 @@ pub(crate) fn ws_connect_impl(
 pub fn ws_connect_blocking(
     url: &str,
     options: Options,
-    on_event: &EventHandler,
+    on_event: &mut EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
     let config = tungstenite::protocol::WebSocketConfig::from(options);

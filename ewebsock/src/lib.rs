@@ -20,6 +20,8 @@
 #[cfg(not(feature = "tokio"))]
 mod native_tungstenite;
 
+use std::ops::ControlFlow;
+
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(not(feature = "tokio"))]
 pub use native_tungstenite::*;
@@ -98,9 +100,9 @@ impl WsReceiver {
         let on_event = Box::new(move |event| {
             wake_up(); // wake up UI thread
             if tx.send(event).is_ok() {
-                std::ops::ControlFlow::Continue(())
+                ControlFlow::Continue(())
             } else {
-                std::ops::ControlFlow::Break(())
+                ControlFlow::Break(())
             }
         });
         let ws_receiver = WsReceiver { rx };
@@ -119,7 +121,7 @@ pub type Error = String;
 /// Short for `Result<T, ewebsock::Error>`.
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
+pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> ControlFlow<()>>;
 
 /// Options for a connection.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -143,6 +145,9 @@ impl Default for Options {
 
 /// Connect to the given URL, and return a sender and receiver.
 ///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
+///
 /// This is a wrapper around [`ws_connect`].
 ///
 /// # Errors
@@ -160,6 +165,9 @@ pub fn connect(url: impl Into<String>, options: Options) -> Result<(WsSender, Ws
 /// Like [`connect`], but will call the given wake-up function on each incoming event.
 ///
 /// This allows you to wake up the UI thread, for instance.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// This is a wrapper around [`ws_connect`].
 ///
@@ -180,6 +188,9 @@ pub fn connect_with_wakeup(
 
 /// Connect and call the given event handler on each received event.
 ///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
+///
 /// See [`crate::connect`] for a more high-level version.
 ///
 /// # Errors
@@ -195,6 +206,9 @@ pub fn ws_connect(url: String, options: Options, on_event: EventHandler) -> Resu
 /// so it can only receive messages, not send them.
 ///
 /// This can be slightly more efficient when you don't need to send messages.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// # Errors
 /// * On native: failure to spawn receiver thread.

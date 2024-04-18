@@ -57,11 +57,9 @@ impl WsSender {
     /// This should never fail, except _maybe_ on Web.
     pub fn close(&mut self) -> Result<()> {
         if let Some(socket) = self.socket.take() {
-            log::debug!("Closing WebSocket");
-            socket.close().map_err(string_from_js_value)
-        } else {
-            Ok(())
+            close_socket(&socket);
         }
+        Ok(())
     }
 
     /// Forget about this sender without closing the connection.
@@ -123,11 +121,7 @@ pub(crate) fn ws_connect_impl(
                         ))),
                     };
                     if control.is_break() {
-                        if let Err(err) = socket3.close() {
-                            log::warn!("Failed to close WebSocket: {err:?}");
-                        } else {
-                            log::debug!("Closed WebSocket");
-                        }
+                        close_socket(&socket3);
                     }
                 })
                     as Box<dyn FnMut(web_sys::ProgressEvent)>);
@@ -148,11 +142,7 @@ pub(crate) fn ws_connect_impl(
                 ))))
             };
             if control.is_break() {
-                if let Err(err) = socket2.close() {
-                    log::warn!("Failed to close WebSocket: {err:?}");
-                } else {
-                    log::debug!("Closed WebSocket");
-                }
+                close_socket(&socket2);
             }
         }) as Box<dyn FnMut(web_sys::MessageEvent)>);
 
@@ -183,11 +173,7 @@ pub(crate) fn ws_connect_impl(
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             let control = on_event(WsEvent::Opened);
             if control.is_break() {
-                if let Err(err) = socket2.close() {
-                    log::warn!("Failed to close WebSocket: {err:?}");
-                } else {
-                    log::debug!("Closed WebSocket");
-                }
+                close_socket(&socket2);
             }
         }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
         socket.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
@@ -205,4 +191,12 @@ pub(crate) fn ws_connect_impl(
     Ok(WsSender {
         socket: Some(socket),
     })
+}
+
+fn close_socket(socket: &web_sys::WebSocket) {
+    if let Err(err) = socket.close() {
+        log::warn!("Failed to close WebSocket: {}", string_from_js_value(err));
+    } else {
+        log::debug!("Closed WebSocket");
+    }
 }

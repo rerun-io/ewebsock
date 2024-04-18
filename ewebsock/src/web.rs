@@ -1,15 +1,17 @@
+#![allow(trivial_casts)]
+
 use std::{ops::ControlFlow, rc::Rc};
 
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 #[allow(clippy::needless_pass_by_value)]
 fn string_from_js_value(s: wasm_bindgen::JsValue) -> String {
-    s.as_string().unwrap_or(format!("{:#?}", s))
+    s.as_string().unwrap_or(format!("{s:#?}"))
 }
 
 #[allow(clippy::needless_pass_by_value)]
 fn string_from_js_string(s: js_sys::JsString) -> String {
-    s.as_string().unwrap_or(format!("{:#?}", s))
+    s.as_string().unwrap_or(format!("{s:#?}"))
 }
 
 /// This is how you send messages to the server.
@@ -38,11 +40,11 @@ impl WsSender {
                 }
                 WsMessage::Text(text) => socket.send_with_str(&text),
                 unknown => {
-                    panic!("Don't know how to send message: {:?}", unknown);
+                    panic!("Don't know how to send message: {unknown:?}");
                 }
             };
             if let Err(err) = result.map_err(string_from_js_value) {
-                log::error!("Failed to send: {:?}", err);
+                log::error!("Failed to send: {err:?}");
             }
         }
     }
@@ -50,6 +52,9 @@ impl WsSender {
     /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
+    ///
+    /// # Errors
+    /// This should never fail, except _maybe_ on Web.
     pub fn close(&mut self) -> Result<()> {
         if let Some(socket) = self.socket.take() {
             log::debug!("Closing WebSocket");
@@ -69,6 +74,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
     ws_connect_impl(url, options, on_event).map(|sender| sender.forget())
 }
 
+#[allow(clippy::needless_pass_by_value)] // For consistency with the native version
 pub(crate) fn ws_connect_impl(
     url: String,
     _ignored_options: Options,
@@ -107,8 +113,16 @@ pub(crate) fn ws_connect_impl(
                 let (mut socket, mut on_event) = (socket, on_event).clone();
                 let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
                     let (mut socket, mut on_event) = (socket, on_event).clone();
-                    let array = js_sys::Uint8Array::new(&file_reader_clone.result().unwrap());
-                    let control = on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())));
+                    let control = match file_reader_clone.result() {
+                        Ok(file_reader) => {
+                            let array = js_sys::Uint8Array::new(&file_reader);
+                            on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())))
+                        }
+                        Err(err) => on_event(WsEvent::Error(format!(
+                            "Failed to read binary blob: {}",
+                            string_from_js_value(err)
+                        ))),
+                    };
                     if control.is_break() {
                         log::debug!("Closing WebSocket");
                         let mut socket = socket.clone();

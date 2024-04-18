@@ -112,7 +112,7 @@ impl FrontEnd {
             ui.separator();
             ui.heading("Received events:");
             for event in &self.events {
-                ui.label(format!("{:?}", event));
+                ui.label(format!("{event:?}"));
             }
         });
     }

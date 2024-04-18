@@ -30,6 +30,10 @@ impl WsSender {
     /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
+    ///
+    /// # Errors
+    /// This should never fail, except _maybe_ on Web.
+    #[allow(clippy::unnecessary_wraps)] // To keep the same signature as the Web version
     pub fn close(&mut self) -> Result<()> {
         if self.tx.is_some() {
             log::debug!("Closing WebSocket");
@@ -124,7 +128,7 @@ pub(crate) fn ws_connect_impl(
     Ok(ws_connect_native(url, options, on_event))
 }
 
-/// Like [`ws_connect`], but cannot fail. Only available on native builds.
+/// Like [`crate::ws_connect`], but cannot fail. Only available on native builds.
 fn ws_connect_native(url: String, options: Options, on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 

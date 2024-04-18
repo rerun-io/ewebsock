@@ -48,6 +48,9 @@ impl WsSender {
     /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
+    ///
+    /// # Errors
+    /// This should never fail, except _maybe_ on Web.
     pub fn close(&mut self) -> Result<()> {
         if let Some(ws) = self.ws.take() {
             log::debug!("Closing WebSocket");

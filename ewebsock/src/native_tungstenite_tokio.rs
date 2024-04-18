@@ -28,6 +28,10 @@ impl WsSender {
     /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
+    ///
+    /// # Errors
+    /// This should never fail, except _maybe_ on Web.
+    #[allow(clippy::unnecessary_wraps)] // To keep the same signature as the Web version
     pub fn close(&mut self) -> Result<()> {
         if self.tx.is_some() {
             log::debug!("Closing WebSocket");

@@ -1,3 +1,5 @@
+# Copied from https://github.com/rerun-io/rerun_template
+#
 # https://github.com/EmbarkStudios/cargo-deny
 #
 # cargo-deny checks our dependency tree for copy-left licenses,
@@ -6,65 +8,66 @@
 # Install: `cargo install cargo-deny`
 # Check: `cargo deny check`.
 
+
 # Note: running just `cargo deny check` without a `--target` can result in
 # false positives due to https://github.com/EmbarkStudios/cargo-deny/issues/324
+[graph]
 targets = [
-    { triple = "aarch64-apple-darwin" },
-    { triple = "i686-pc-windows-gnu" },
-    { triple = "i686-pc-windows-msvc" },
-    { triple = "i686-unknown-linux-gnu" },
-    { triple = "wasm32-unknown-unknown" },
-    { triple = "x86_64-apple-darwin" },
-    { triple = "x86_64-pc-windows-gnu" },
-    { triple = "x86_64-pc-windows-msvc" },
-    { triple = "x86_64-unknown-linux-gnu" },
-    { triple = "x86_64-unknown-linux-musl" },
-    { triple = "x86_64-unknown-redox" },
+  { triple = "aarch64-apple-darwin" },
+  { triple = "i686-pc-windows-gnu" },
+  { triple = "i686-pc-windows-msvc" },
+  { triple = "i686-unknown-linux-gnu" },
+  { triple = "wasm32-unknown-unknown" },
+  { triple = "x86_64-apple-darwin" },
+  { triple = "x86_64-pc-windows-gnu" },
+  { triple = "x86_64-pc-windows-msvc" },
+  { triple = "x86_64-unknown-linux-gnu" },
+  { triple = "x86_64-unknown-linux-musl" },
+  { triple = "x86_64-unknown-redox" },
 ]
+all-features = true
+
 
 [advisories]
-vulnerability = "deny"
-unmaintained = "warn"
-yanked = "deny"
-ignore = [
-    "RUSTSEC-2021-0019", # https://rustsec.org/advisories/RUSTSEC-2021-0019 - Multiple soundness issues. From xcb <- x11-clipboard <- copypasta <- egui-winit
-]
+version = 2
+ignore = []
+
 
 [bans]
 multiple-versions = "deny"
-wildcards = "allow" # at least until https://github.com/EmbarkStudios/cargo-deny/issues/241 is fixed
+wildcards = "allow" # We use them for examples
 deny = [
-    { name = "openssl" },     # prefer rustls
-    { name = "openssl-sys" }, # prefer rustls
+  { name = "openssl", reason = "Use rustls" },
+  { name = "openssl-sys", reason = "Use rustls" },
 ]
-
 skip = []
 skip-tree = [
-    { name = "eframe" }, # Only used by example app
+  { name = "eframe" }, # Only used by example app
 ]
 
 
 [licenses]
-unlicensed = "deny"
-allow-osi-fsf-free = "neither"
-confidence-threshold = 0.92 # We want really high confidence when inferring licenses from text
-copyleft = "deny"
+version = 2
+private = { ignore = true }
+confidence-threshold = 0.93 # We want really high confidence when inferring licenses from text
 allow = [
-    "Apache-2.0 WITH LLVM-exception", # https://spdx.org/licenses/LLVM-exception.html
-    "Apache-2.0",                     # https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)
-    "BSD-2-Clause",                   # https://tldrlegal.com/license/bsd-2-clause-license-(freebsd)
-    "BSD-3-Clause",                   # https://tldrlegal.com/license/bsd-3-clause-license-(revised)
-    "BSL-1.0",                        # https://tldrlegal.com/license/boost-software-license-1.0-explained
-    "CC0-1.0",                        # https://creativecommons.org/publicdomain/zero/1.0/
-    "ISC",                            # https://tldrlegal.com/license/-isc-license
-    "LicenseRef-UFL-1.0",             # https://tldrlegal.com/license/ubuntu-font-license,-1.0 - no official SPDX, see https://github.com/emilk/egui/issues/2321
-    "MIT",                            # https://tldrlegal.com/license/mit-license
-    "MPL-2.0",                        # https://www.mozilla.org/en-US/MPL/2.0/FAQ/ - see Q11
-    "OFL-1.1",                        # https://spdx.org/licenses/OFL-1.1.html
-    "OpenSSL",                        # https://www.openssl.org/source/license.html
-    "Unicode-DFS-2016",               # https://spdx.org/licenses/Unicode-DFS-2016.html
-    "Zlib",                           # https://tldrlegal.com/license/zlib-libpng-license-(zlib)
+  "Apache-2.0 WITH LLVM-exception", # https://spdx.org/licenses/LLVM-exception.html
+  "Apache-2.0",                     # https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)
+  "BSD-2-Clause",                   # https://tldrlegal.com/license/bsd-2-clause-license-(freebsd)
+  "BSD-3-Clause",                   # https://tldrlegal.com/license/bsd-3-clause-license-(revised)
+  "BSL-1.0",                        # https://tldrlegal.com/license/boost-software-license-1.0-explained
+  "CC0-1.0",                        # https://creativecommons.org/publicdomain/zero/1.0/
+  "ISC",                            # https://www.tldrlegal.com/license/isc-license
+  "LicenseRef-UFL-1.0",             # See https://github.com/emilk/egui/issues/2321
+  "MIT-0",                          # https://choosealicense.com/licenses/mit-0/
+  "MIT",                            # https://tldrlegal.com/license/mit-license
+  "MPL-2.0",                        # https://www.mozilla.org/en-US/MPL/2.0/FAQ/ - see Q11. Used by webpki-roots on Linux.
+  "OFL-1.1",                        # https://spdx.org/licenses/OFL-1.1.html
+  "OpenSSL",                        # https://www.openssl.org/source/license.html - used on Linux
+  "Unicode-DFS-2016",               # https://spdx.org/licenses/Unicode-DFS-2016.html
+  "Zlib",                           # https://tldrlegal.com/license/zlib-libpng-license-(zlib)
 ]
+exceptions = []
 
 [[licenses.clarify]]
 name = "webpki"
@@ -72,11 +75,14 @@ expression = "ISC"
 license-files = [{ path = "LICENSE", hash = 0x001c7e6c }]
 
 [[licenses.clarify]]
-name = "rustls-webpki"
-expression = "ISC"
-license-files = [{ path = "LICENSE", hash = 0x001c7e6c }]
-
-[[licenses.clarify]]
 name = "ring"
 expression = "MIT AND ISC AND OpenSSL"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+
+[sources.allow-org]
+github = ["emilk", "rerun-io"]

@@ -97,10 +97,9 @@ pub(crate) fn ws_connect_impl(
 
     // onmessage callback
     {
-        let (mut socket, on_event) = (socket, on_event).clone();
+        let on_event = on_event.clone();
+        let socket2 = socket.clone();
         let onmessage_callback = Closure::wrap(Box::new(move |e: web_sys::MessageEvent| {
-            let (mut socket, mut on_event) = (socket, on_event).clone();
-
             // Handle difference Text/Binary,...
             let control = if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
                 let array = js_sys::Uint8Array::new(&abuf);
@@ -110,9 +109,9 @@ pub(crate) fn ws_connect_impl(
                 let file_reader = web_sys::FileReader::new().expect("Failed to create FileReader");
                 let file_reader_clone = file_reader.clone();
                 // create onLoadEnd callback
-                let (mut socket, mut on_event) = (socket, on_event).clone();
+                let on_event = on_event.clone();
+                let socket3 = socket2.clone();
                 let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
-                    let (mut socket, mut on_event) = (socket, on_event).clone();
                     let control = match file_reader_clone.result() {
                         Ok(file_reader) => {
                             let array = js_sys::Uint8Array::new(&file_reader);
@@ -124,9 +123,11 @@ pub(crate) fn ws_connect_impl(
                         ))),
                     };
                     if control.is_break() {
-                        log::debug!("Closing WebSocket");
-                        let mut socket = socket.clone();
-                        socket.close();
+                        if let Err(err) = socket3.close() {
+                            log::warn!("Failed to close WebSocket: {err:?}");
+                        } else {
+                            log::debug!("Closed WebSocket");
+                        }
                     }
                 })
                     as Box<dyn FnMut(web_sys::ProgressEvent)>);
@@ -146,15 +147,12 @@ pub(crate) fn ws_connect_impl(
                     e.data(),
                 ))))
             };
-
             if control.is_break() {
-                socket.close();
-                e.target()
-                    .unwrap()
-                    .dyn_into::<web_sys::WebSocket>()
-                    .unwrap()
-                    .close()
-                    .unwrap();
+                if let Err(err) = socket2.close() {
+                    log::warn!("Failed to close WebSocket: {err:?}");
+                } else {
+                    log::debug!("Closed WebSocket");
+                }
             }
         }) as Box<dyn FnMut(web_sys::MessageEvent)>);
 
@@ -180,11 +178,16 @@ pub(crate) fn ws_connect_impl(
     }
 
     {
-        let (socket, on_event) = (socket, on_event).clone();
+        let socket2 = socket.clone();
+        let on_event = on_event.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             let control = on_event(WsEvent::Opened);
             if control.is_break() {
-                socket.close();
+                if let Err(err) = socket2.close() {
+                    log::warn!("Failed to close WebSocket: {err:?}");
+                } else {
+                    log::debug!("Closed WebSocket");
+                }
             }
         }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
         socket.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));

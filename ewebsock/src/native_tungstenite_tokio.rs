@@ -69,7 +69,9 @@ async fn ws_connect_async(
     log::info!("WebSocket handshake has been successfully completed");
 
     let control = on_event(WsEvent::Opened);
-    // TODO: handle control.is_break()
+    if control.is_break() {
+        log::warn!("ControlFlow::Break not implemented for the tungstenite tokio backend");
+    }
 
     let (write, read) = ws_stream.split();
 
@@ -104,7 +106,9 @@ async fn ws_connect_async(
             },
             Err(err) => on_event(WsEvent::Error(err.to_string())),
         };
-        // TODO: handle control.is_break()
+        if control.is_break() {
+            log::warn!("ControlFlow::Break not implemented for the tungstenite tokio backend");
+        }
         async {}
     });
 

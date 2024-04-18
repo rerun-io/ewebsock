@@ -85,7 +85,7 @@ pub(crate) fn ws_connect_impl(
     socket.set_binary_type(web_sys::BinaryType::Arraybuffer);
 
     // Allow it to be shared by the different callbacks:
-    let on_event: Rc<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>> = on_event.into();
+    let on_event: Rc<dyn Send + Fn(WsEvent) -> ControlFlow<()>> = on_event.into();
 
     // onmessage callback
     {

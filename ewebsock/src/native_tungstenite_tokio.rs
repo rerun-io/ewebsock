@@ -11,9 +11,7 @@ pub struct WsSender {
 
 impl Drop for WsSender {
     fn drop(&mut self) {
-        if let Err(err) = self.close() {
-            log::warn!("Failed to close web-socket: {err:?}");
-        }
+        self.close();
     }
 }
 
@@ -30,16 +28,11 @@ impl WsSender {
     /// Close the connection.
     ///
     /// This is called automatically when the sender is dropped.
-    ///
-    /// # Errors
-    /// This should never fail, except _maybe_ on Web.
-    #[allow(clippy::unnecessary_wraps)] // To keep the same signature as the Web version
-    pub fn close(&mut self) -> Result<()> {
+    pub fn close(&mut self) {
         if self.tx.is_some() {
             log::debug!("Closing WebSocket");
         }
         self.tx = None;
-        Ok(())
     }
 
     /// Forget about this sender without closing the connection.

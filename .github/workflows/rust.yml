@@ -125,12 +125,12 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --target wasm32-unknown-unknown
+          args: --target wasm32-unknown-unknown --lib
 
       - name: Cranky wasm32
         env:
           CLIPPY_CONF_DIR: "scripts/clippy_wasm" # Use scripts/clippy_wasm/clippy.toml
-        run: cargo cranky --target wasm32-unknown-unknown -- -D warnings
+        run: cargo cranky --target wasm32-unknown-unknown --lib -- -D warnings
 
   # ---------------------------------------------------------------------------
 

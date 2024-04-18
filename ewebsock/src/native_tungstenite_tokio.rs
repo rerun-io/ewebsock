@@ -127,7 +127,7 @@ pub(crate) fn ws_connect_impl(
     Ok(ws_connect_native(url, options, on_event))
 }
 
-/// Like [`ws_connect`], but cannot fail. Only available on native builds.
+/// Like [`crate::ws_connect`], but cannot fail. Only available on native builds.
 fn ws_connect_native(url: String, options: Options, on_event: EventHandler) -> WsSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
 

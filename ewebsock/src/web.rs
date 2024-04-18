@@ -107,11 +107,22 @@ pub(crate) fn ws_connect_impl(
                 let file_reader_clone = file_reader.clone();
                 // create onLoadEnd callback
                 let on_event = on_event.clone();
-                let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
-                    let array = js_sys::Uint8Array::new(&file_reader_clone.result().unwrap());
-                    on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())));
-                })
-                    as Box<dyn FnMut(web_sys::ProgressEvent)>);
+                let onloadend_cb =
+                    Closure::wrap(Box::new(
+                        move |_e: web_sys::ProgressEvent| match file_reader_clone.result() {
+                            Ok(file_reader) => {
+                                let array = js_sys::Uint8Array::new(&file_reader);
+                                on_event(WsEvent::Message(WsMessage::Binary(array.to_vec())));
+                            }
+                            Err(err) => {
+                                on_event(WsEvent::Error(format!(
+                                    "Failed to read binary blob: {}",
+                                    string_from_js_value(err)
+                                )));
+                            }
+                        },
+                    )
+                        as Box<dyn FnMut(web_sys::ProgressEvent)>);
                 file_reader.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
                 file_reader
                     .read_as_array_buffer(&blob)

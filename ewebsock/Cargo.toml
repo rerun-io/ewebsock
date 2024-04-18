@@ -28,6 +28,8 @@ tls = ["tungstenite/rustls-tls-webpki-roots"]
 ## This adds a lot of dependencies,
 ## but may yield lower latency and CPU usage
 ## when using `ws_connect`.
+##
+## Will ignore any `ControlFlow::Break` returned from the `on_event` callback.
 tokio = [
   "dep:async-stream",
   "dep:futures",

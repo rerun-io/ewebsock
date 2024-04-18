@@ -1,4 +1,5 @@
 #![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
+#![allow(clippy::unwrap_used, clippy::disallowed_methods)] // We are just testing here.
 
 use std::{net::TcpListener, thread::spawn};
 

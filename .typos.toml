@@ -3,7 +3,8 @@
 # run:      typos
 
 [files]
-extend-exclude = [".typos.toml", "docs/example_app.js"]
+extend-exclude = ["docs/example_app.js"]
 
 
 [default.extend-words]
+teh = "teh" # part of @teh-cmc

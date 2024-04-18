@@ -1,37 +1,38 @@
+# Copied from https://github.com/rerun-io/rerun_template
 on: [push, pull_request]
 
-name: CI
+name: Rust
 
 env:
-  # This is required to enable the web_sys clipboard API which egui_web uses
+  # --cfg=web_sys_unstable_apis is required to enable the web_sys clipboard API which egui_web uses
   # https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Clipboard.html
   # https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html
-  RUSTFLAGS: --cfg=web_sys_unstable_apis
+  RUSTFLAGS: -D warnings --cfg=web_sys_unstable_apis
+  RUSTDOCFLAGS: -D warnings
 
 jobs:
-  check:
-    name: Rust format, cranky, check, test, doc
+  rust-check:
+    name: Rust
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
       - uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
+          profile: default
           toolchain: 1.73.0
           override: true
-          components: rustfmt, clippy
 
-      - run: |
-          sudo apt-get update
-          sudo apt-get install libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libspeechd-dev libxkbcommon-dev libssl-dev
+      - name: Install packages (Linux)
+        uses: awalsh128/cache-apt-pkgs-action@v1.3.0
+        with:
+          # Some deps used by eframe:
+          packages: libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libssl-dev
+          version: 1.0
+          execute_install_scripts: true
 
       - name: Set up cargo cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Install cargo-cranky
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-cranky
 
       - name: Rustfmt
         uses: actions-rs/cargo@v1
@@ -39,22 +40,28 @@ jobs:
           command: fmt
           args: --all -- --check
 
-      - name: Cranky
-        uses: actions-rs/cargo@v1
+      - name: Install cargo-cranky
+        uses: baptiste0928/cargo-install@v1
         with:
-          command: cranky
-          args: --all-targets --all-features --  -D warnings
+          crate: cargo-cranky
 
-      - name: Check
+      - name: check --all-features
         uses: actions-rs/cargo@v1
         with:
           command: check
+          args: --all-features --all-targets
 
-      - name: Check --all-features
+      - name: check default features
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --all-features
+          args: --all-targets
+
+      - name: check --no-default-features
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --no-default-features --lib --all-targets
 
       - name: Test doc-tests
         uses: actions-rs/cargo@v1
@@ -62,11 +69,11 @@ jobs:
           command: test
           args: --doc --all-features
 
-      - name: cargo doc
+      - name: cargo doc --lib
         uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --no-deps --all-features
+          args: --lib --no-deps --all-features
 
       - name: cargo doc --document-private-items
         uses: actions-rs/cargo@v1
@@ -74,17 +81,31 @@ jobs:
           command: doc
           args: --document-private-items --no-deps --all-features
 
-      - name: Test
+      - name: Build tests
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --lib
+          args: --all-features --no-run
+
+      - name: Run test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features
+
+      - name: Cranky
+        uses: actions-rs/cargo@v1
+        with:
+          command: cranky
+          args: --all-targets --all-features -- -D warnings
+
+  # ---------------------------------------------------------------------------
 
   check_wasm:
     name: Check wasm32
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -95,19 +116,31 @@ jobs:
       - name: Set up cargo cache
         uses: Swatinem/rust-cache@v2
 
+      - name: Install cargo-cranky
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-cranky
+
       - name: Check wasm32
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --all-features --lib --target wasm32-unknown-unknown
+          args: --target wasm32-unknown-unknown --lib
+
+      - name: Cranky wasm32
+        env:
+          CLIPPY_CONF_DIR: "scripts/clippy_wasm" # Use scripts/clippy_wasm/clippy.toml
+        run: cargo cranky --target wasm32-unknown-unknown --lib -- -D warnings
+
+  # ---------------------------------------------------------------------------
 
   cargo-deny:
     name: Check Rust dependencies (cargo-deny)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: EmbarkStudios/cargo-deny-action@v1
-        with:
-          rust-version: "1.73.0"
-          log-level: error
+    - uses: actions/checkout@v3
+    - uses: EmbarkStudios/cargo-deny-action@v1
+      with:
+        rust-version: "1.73.0"
+        log-level: warn
+        command: check

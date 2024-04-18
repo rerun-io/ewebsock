@@ -1,13 +1,15 @@
+#![allow(trivial_casts)]
+
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 #[allow(clippy::needless_pass_by_value)]
 fn string_from_js_value(s: wasm_bindgen::JsValue) -> String {
-    s.as_string().unwrap_or(format!("{:#?}", s))
+    s.as_string().unwrap_or(format!("{s:#?}"))
 }
 
 #[allow(clippy::needless_pass_by_value)]
 fn string_from_js_string(s: js_sys::JsString) -> String {
-    s.as_string().unwrap_or(format!("{:#?}", s))
+    s.as_string().unwrap_or(format!("{s:#?}"))
 }
 
 /// This is how you send messages to the server.
@@ -36,11 +38,11 @@ impl WsSender {
                 }
                 WsMessage::Text(text) => ws.send_with_str(&text),
                 unknown => {
-                    panic!("Don't know how to send message: {:?}", unknown);
+                    panic!("Don't know how to send message: {unknown:?}");
                 }
             };
             if let Err(err) = result.map_err(string_from_js_value) {
-                log::error!("Failed to send: {:?}", err);
+                log::error!("Failed to send: {err:?}");
             }
         }
     }
@@ -70,6 +72,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
     ws_connect_impl(url, options, on_event).map(|sender| sender.forget())
 }
 
+#[allow(clippy::needless_pass_by_value)] // For consistency with the native version
 pub(crate) fn ws_connect_impl(
     url: String,
     _ignored_options: Options,

@@ -167,17 +167,19 @@ pub fn ws_connect_blocking(
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
     let uri: http::Uri = url.parse().unwrap();
-    let builder = tungstenite::ClientRequestBuilder::new(uri).with_header("Origin", url);
-    let (mut socket, response) =
-        match tungstenite::client::connect_with_config(builder, Some(config), max_redirects) {
-            Ok(result) => result,
-            Err(err) => {
-                return Err(format!("Connect: {err}"));
-            }
-        };
+    let (mut socket, response) = match tungstenite::client::connect_with_config(
+        crate::into_requester(uri, options),
+        Some(config),
+        max_redirects,
+    ) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(format!("Connect: {err}"));
+        }
+    };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(

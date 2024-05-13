@@ -43,6 +43,26 @@ mod web;
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
 
+/// transfrom uri and options into a request builder
+pub fn into_requester(
+    uri: http::Uri,
+    options: Options,
+) -> tungstenite::client::ClientRequestBuilder {
+    let mut client_request: tungstenite::ClientRequestBuilder =
+        tungstenite::client::ClientRequestBuilder::new(uri);
+    if let Some(headers) = options.additional_headers {
+        for (key, value) in headers {
+            client_request = client_request.with_header(key, value);
+        }
+    }
+    if let Some(subprotocols) = options.subprotocols {
+        for subprotocol in subprotocols {
+            client_request = client_request.with_sub_protocol(subprotocol);
+        }
+    }
+    client_request
+}
+
 // ----------------------------------------------------------------------------
 
 /// A web-socket message.
@@ -124,7 +144,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> ControlFlow<()>>;
 
 /// Options for a connection.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Options {
     /// The maximum size of a single incoming message frame, in bytes.
     ///
@@ -133,12 +153,20 @@ pub struct Options {
     ///
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
+
+    /// Additional [`Request`] headers
+    pub additional_headers: Option<Vec<(String, String)>>,
+
+    /// Additional subprotocols
+    pub subprotocols: Option<Vec<String>>,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
             max_incoming_frame_size: 64 * 1024 * 1024,
+            additional_headers: None,
+            subprotocols: None,
         }
     }
 }

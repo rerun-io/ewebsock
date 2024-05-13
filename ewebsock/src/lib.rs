@@ -2,7 +2,8 @@
 //!
 //! Usage:
 //! ``` no_run
-//! let (mut sender, receiver) = ewebsock::connect("ws://example.com").unwrap();
+//! let options = ewebsock::Options::default();
+//! let (mut sender, receiver) = ewebsock::connect("ws://example.com", options).unwrap();
 //! sender.send(ewebsock::WsMessage::Text("Hello!".into()));
 //! while let Some(event) = receiver.try_recv() {
 //!     println!("Received {:?}", event);
@@ -19,6 +20,8 @@
 #[cfg(not(feature = "tokio"))]
 mod native_tungstenite;
 
+use std::ops::ControlFlow;
+
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(not(feature = "tokio"))]
 pub use native_tungstenite::*;
@@ -30,6 +33,9 @@ mod native_tungstenite_tokio;
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "tokio")]
 pub use native_tungstenite_tokio::*;
+
+#[cfg(not(target_arch = "wasm32"))]
+mod tungstenite_common;
 
 #[cfg(target_arch = "wasm32")]
 mod web;
@@ -94,9 +100,9 @@ impl WsReceiver {
         let on_event = Box::new(move |event| {
             wake_up(); // wake up UI thread
             if tx.send(event).is_ok() {
-                std::ops::ControlFlow::Continue(())
+                ControlFlow::Continue(())
             } else {
-                std::ops::ControlFlow::Break(())
+                ControlFlow::Break(())
             }
         });
         let ws_receiver = WsReceiver { rx };
@@ -115,9 +121,32 @@ pub type Error = String;
 /// Short for `Result<T, ewebsock::Error>`.
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFlow<()>>;
+pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> ControlFlow<()>>;
+
+/// Options for a connection.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Options {
+    /// The maximum size of a single incoming message frame, in bytes.
+    ///
+    /// The primary reason for setting this to something other than [`usize::MAX`] is
+    /// to prevent a malicious server from eating up all your RAM.
+    ///
+    /// Ignored on Web.
+    pub max_incoming_frame_size: usize,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Self {
+            max_incoming_frame_size: 64 * 1024 * 1024,
+        }
+    }
+}
 
 /// Connect to the given URL, and return a sender and receiver.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// This is a wrapper around [`ws_connect`].
 ///
@@ -127,15 +156,18 @@ pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> std::ops::ControlFl
 ///
 /// See also the [`connect_with_wakeup`] function,
 /// and the more advanced [`ws_connect`].
-pub fn connect(url: impl Into<String>) -> Result<(WsSender, WsReceiver)> {
+pub fn connect(url: impl Into<String>, options: Options) -> Result<(WsSender, WsReceiver)> {
     let (ws_receiver, on_event) = WsReceiver::new();
-    let ws_sender = ws_connect(url.into(), on_event)?;
+    let ws_sender = ws_connect(url.into(), options, on_event)?;
     Ok((ws_sender, ws_receiver))
 }
 
 /// Like [`connect`], but will call the given wake-up function on each incoming event.
 ///
 /// This allows you to wake up the UI thread, for instance.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// This is a wrapper around [`ws_connect`].
 ///
@@ -146,22 +178,26 @@ pub fn connect(url: impl Into<String>) -> Result<(WsSender, WsReceiver)> {
 /// Note that you have to wait for [`WsEvent::Opened`] before sending messages.
 pub fn connect_with_wakeup(
     url: impl Into<String>,
+    options: Options,
     wake_up: impl Fn() + Send + Sync + 'static,
 ) -> Result<(WsSender, WsReceiver)> {
     let (receiver, on_event) = WsReceiver::new_with_callback(wake_up);
-    let sender = ws_connect(url.into(), on_event)?;
+    let sender = ws_connect(url.into(), options, on_event)?;
     Ok((sender, receiver))
 }
 
 /// Connect and call the given event handler on each received event.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// See [`crate::connect`] for a more high-level version.
 ///
 /// # Errors
 /// * On native: failure to spawn a thread.
 /// * On web: failure to use `WebSocket` API.
-pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
-    ws_connect_impl(url, on_event)
+pub fn ws_connect(url: String, options: Options, on_event: EventHandler) -> Result<WsSender> {
+    ws_connect_impl(url, options, on_event)
 }
 
 /// Connect and call the given event handler on each received event.
@@ -169,11 +205,14 @@ pub fn ws_connect(url: String, on_event: EventHandler) -> Result<WsSender> {
 /// This is like [`ws_connect`], but it doesn't return a [`WsSender`],
 /// so it can only receive messages, not send them.
 ///
-/// This can be slightly more efficent when you don't need to send messages.
+/// This can be slightly more efficient when you don't need to send messages.
+///
+/// If `on_event` returns [`ControlFlow::Break`], the connection will be closed
+/// without calling `on_event` again.
 ///
 /// # Errors
 /// * On native: failure to spawn receiver thread.
 /// * On web: failure to use `WebSocket` API.
-pub fn ws_receive(url: String, on_event: EventHandler) -> Result<()> {
-    ws_receive_impl(url, on_event)
+pub fn ws_receive(url: String, options: Options, on_event: EventHandler) -> Result<()> {
+    ws_receive_impl(url, options, on_event)
 }

@@ -5,7 +5,7 @@ use eframe::wasm_bindgen::{self, prelude::*};
 /// It loads the app, installs some callbacks, then returns.
 /// You can add more callbacks like this if you want to call in to your code.
 #[wasm_bindgen]
-pub async fn start(canvas_id: &str) -> std::result::Result<(), eframe::wasm_bindgen::JsValue> {
+pub async fn start(canvas_id: &str) -> Result<(), JsValue> {
     // Redirect `log` message to `console.log` and friends:
     eframe::WebLogger::init(log::LevelFilter::Debug).ok();
 

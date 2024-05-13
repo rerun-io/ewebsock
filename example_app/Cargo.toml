@@ -3,7 +3,7 @@ name = "example_app"
 version = "0.1.0"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.73"
 license = "MIT OR Apache-2.0"
 include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 publish = false
@@ -23,7 +23,7 @@ tokio = ["ewebsock/tokio", "dep:tokio"]
 [dependencies]
 ewebsock = { path = "../ewebsock", features = ["tls"] }
 
-eframe = "0.22.0" # Gives us egui, epi and web+native backends
+eframe = "0.26.2" # Gives us egui, epi and web+native backends
 log = "0.4"
 
 # native:

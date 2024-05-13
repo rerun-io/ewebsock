@@ -1,10 +1,10 @@
 [package]
 name = "ewebsock"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 description = "WebSocket client that works natively and on the web (WASM)"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.73"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 homepage = "https://github.com/rerun-io/ewebsock"
@@ -28,6 +28,8 @@ tls = ["tungstenite/rustls-tls-webpki-roots"]
 ## This adds a lot of dependencies,
 ## but may yield lower latency and CPU usage
 ## when using `ws_connect`.
+##
+## Will ignore any `ControlFlow::Break` returned from the `on_event` callback.
 tokio = [
   "dep:async-stream",
   "dep:futures",
@@ -54,7 +56,7 @@ futures-util = { version = "0.3", optional = true, default-features = false, fea
   "std",
 ] }
 tokio = { version = "1.16", features = ["rt", "sync"], optional = true }
-tokio-tungstenite = { version = ">=0.17, <=0.20", optional = true }
+tokio-tungstenite = { version = ">=0.17, <=0.21", optional = true }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]

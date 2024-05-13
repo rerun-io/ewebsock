@@ -25,7 +25,7 @@ impl eframe::App for ExampleApp {
                 egui::menu::bar(ui, |ui| {
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
-                            _frame.close();
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
                     });
                 });
@@ -61,7 +61,7 @@ impl eframe::App for ExampleApp {
 impl ExampleApp {
     fn connect(&mut self, ctx: egui::Context) {
         let wakeup = move || ctx.request_repaint(); // wake up UI thread on new message
-        match ewebsock::connect_with_wakeup(&self.url, wakeup) {
+        match ewebsock::connect_with_wakeup(&self.url, Default::default(), wakeup) {
             Ok((ws_sender, ws_receiver)) => {
                 self.frontend = Some(FrontEnd::new(ws_sender, ws_receiver));
                 self.error.clear();
@@ -112,7 +112,7 @@ impl FrontEnd {
             ui.separator();
             ui.heading("Received events:");
             for event in &self.events {
-                ui.label(format!("{:?}", event));
+                ui.label(format!("{event:?}"));
             }
         });
     }

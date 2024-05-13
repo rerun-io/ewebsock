@@ -13,7 +13,9 @@ This is a simple [WebSocket](https://en.wikipedia.org/wiki/WebSocket) library fo
 ## Usage
 
 ``` rust
-let (mut sender, receiver) = ewebsock::connect("ws://example.com").unwrap();
+let options = ewebsock::Options::default();
+// add header and subprotocol to options
+let (mut sender, receiver) = ewebsock::connect("ws://example.com", options).unwrap();
 sender.send(ewebsock::WsMessage::Text("Hello!".into()));
 while let Some(event) = receiver.try_recv() {
     println!("Received {:?}", event);
@@ -21,19 +23,19 @@ while let Some(event) = receiver.try_recv() {
 ```
 
 ## Testing
+
 First start the example echo server with:
+
 ```sh
 cargo r -p echo_server
 ```
 
-Then test the native library with:
+Then test the library with:
 
 ```sh
+# native mode
 cargo run -p example_app
-```
 
-And the web library with:
-```sh
-./example_app/start_server.sh &
-./example_app/build_web.sh --open
+# web mode
+cd example_app/ && trunk serve
 ```

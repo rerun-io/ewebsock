@@ -7,6 +7,26 @@ use std::{
 
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
+/// transfrom uri and options into a request builder
+pub fn into_requester(
+    uri: http::Uri,
+    options: Options,
+) -> tungstenite::client::ClientRequestBuilder {
+    let mut client_request: tungstenite::client::ClientRequestBuilder =
+        tungstenite::client::ClientRequestBuilder::new(uri);
+    if let Some(headers) = options.additional_headers {
+        for (key, value) in headers {
+            client_request = client_request.with_header(key, value);
+        }
+    }
+    if let Some(subprotocols) = options.subprotocols {
+        for subprotocol in subprotocols {
+            client_request = client_request.with_sub_protocol(subprotocol);
+        }
+    }
+    client_request
+}
+
 /// This is how you send [`WsMessage`]s to the server.
 ///
 /// When the last clone of this is dropped, the connection is closed.
@@ -70,17 +90,19 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
     let uri: http::Uri = url.parse().unwrap();
-    let builder = tungstenite::ClientRequestBuilder::new(uri).with_header("Origin", url);
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
 
-    let (mut socket, response) =
-        match tungstenite::client::connect_with_config(builder, Some(config), max_redirects) {
-            Ok(result) => result,
-            Err(err) => {
-                return Err(format!("Connect: {err}"));
-            }
-        };
+    let (mut socket, response) = match tungstenite::client::connect_with_config(
+        crate::into_requester(uri, options),
+        Some(config),
+        max_redirects,
+    ) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(format!("Connect: {err}"));
+        }
+    };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(

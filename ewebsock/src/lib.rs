@@ -43,26 +43,6 @@ mod web;
 #[cfg(target_arch = "wasm32")]
 pub use web::*;
 
-/// transfrom uri and options into a request builder
-pub fn into_requester(
-    uri: http::Uri,
-    options: Options,
-) -> tungstenite::client::ClientRequestBuilder {
-    let mut client_request: tungstenite::ClientRequestBuilder =
-        tungstenite::client::ClientRequestBuilder::new(uri);
-    if let Some(headers) = options.additional_headers {
-        for (key, value) in headers {
-            client_request = client_request.with_header(key, value);
-        }
-    }
-    if let Some(subprotocols) = options.subprotocols {
-        for subprotocol in subprotocols {
-            client_request = client_request.with_sub_protocol(subprotocol);
-        }
-    }
-    client_request
-}
-
 // ----------------------------------------------------------------------------
 
 /// A web-socket message.

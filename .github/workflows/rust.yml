@@ -20,7 +20,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: default
-          toolchain: 1.73.0
+          toolchain: 1.76.0
           override: true
 
       - name: Install packages (Linux)
@@ -39,11 +39,6 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-
-      - name: Install cargo-cranky
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-cranky
 
       - name: check --all-features
         uses: actions-rs/cargo@v1
@@ -93,10 +88,10 @@ jobs:
           command: test
           args: --all-features
 
-      - name: Cranky
+      - name: Clippy
         uses: actions-rs/cargo@v1
         with:
-          command: cranky
+          command: clippy
           args: --all-targets --all-features -- -D warnings
 
   # ---------------------------------------------------------------------------
@@ -109,17 +104,12 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.73.0
+          toolchain: 1.76.0
           target: wasm32-unknown-unknown
           override: true
 
       - name: Set up cargo cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Install cargo-cranky
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-cranky
 
       - name: Check wasm32
         uses: actions-rs/cargo@v1
@@ -127,10 +117,10 @@ jobs:
           command: check
           args: --target wasm32-unknown-unknown --lib
 
-      - name: Cranky wasm32
+      - name: Clippy wasm32
         env:
           CLIPPY_CONF_DIR: "scripts/clippy_wasm" # Use scripts/clippy_wasm/clippy.toml
-        run: cargo cranky --target wasm32-unknown-unknown --lib -- -D warnings
+        run: cargo clippy --target wasm32-unknown-unknown --lib -- -D warnings
 
   # ---------------------------------------------------------------------------
 
@@ -141,6 +131,6 @@ jobs:
     - uses: actions/checkout@v3
     - uses: EmbarkStudios/cargo-deny-action@v1
       with:
-        rust-version: "1.73.0"
+        rust-version: "1.76.0"
         log-level: warn
         command: check

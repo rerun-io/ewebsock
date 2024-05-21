@@ -1,6 +1,5 @@
-- [ ] Update `CHANGELOG.md`
+- [ ] Update `CHANGELOG.md` with `./scripts/generate_changelog.py`
 - [ ] Bump version number
-- [ ] `./check.sh`
 - [ ] `./example_app/build_web.sh --open`
 - [ ] `git commit -m 'Release 0.x.0 - summary'`
 - [ ] `cargo publish -p ewebsock`

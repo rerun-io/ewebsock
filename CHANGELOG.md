@@ -1,6 +1,11 @@
 ## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
 
 
+## [0.6.0]((https://github.com/rerun-io/ewebsock/compare/0.5.0...0.6.0) - 2024-05-21
+* Allow closing the connecting by returning `ControlFlow::Break` [#33](https://github.com/rerun-io/ewebsock/pull/33)
+* Update MSRV to Rust 1.76 [#35](https://github.com/rerun-io/ewebsock/pull/35)
+
+
 ## [0.5.0]((https://github.com/rerun-io/ewebsock/compare/0.4.1...0.5.0) - 2024-02-26
 * Add `Options` for controlling max frame size of incoming messages - ([#29](https://github.com/rerun-io/ewebsock/pull/29))
 

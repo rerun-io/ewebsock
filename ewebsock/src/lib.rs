@@ -105,7 +105,7 @@ impl WsReceiver {
                 ControlFlow::Break(())
             }
         });
-        let ws_receiver = WsReceiver { rx };
+        let ws_receiver = Self { rx };
         (ws_receiver, on_event)
     }
 

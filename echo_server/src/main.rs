@@ -11,15 +11,17 @@ fn main() {
         spawn(move || {
             let mut websocket = tungstenite::accept(stream.unwrap()).unwrap();
             eprintln!("New client connected");
-            loop {
-                let msg = websocket.read_message().unwrap();
-
+            while let Ok(msg) = websocket.read_message() {
                 // We do not want to send back ping/pong messages.
                 if msg.is_binary() || msg.is_text() {
-                    websocket.write_message(msg).unwrap();
-                    eprintln!("Responded.");
+                    if websocket.write_message(msg).is_ok() {
+                        eprintln!("Responded.");
+                    } else {
+                        break;
+                    }
                 }
             }
+            eprintln!("Client left.");
         });
     }
 }

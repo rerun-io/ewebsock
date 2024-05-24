@@ -157,7 +157,7 @@ pub(crate) fn ws_connect_impl(
             on_event(WsEvent::Error(
                 message
                     .as_string()
-                    .unwrap_or_else(|| "Unknown error".to_string()),
+                    .unwrap_or_else(|| "Unknown error".to_owned()),
             ));
         }) as Box<dyn FnMut(web_sys::ErrorEvent)>);
         socket.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));

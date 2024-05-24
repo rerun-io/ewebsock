@@ -150,12 +150,14 @@ pub(crate) fn ws_connect_impl(
     {
         let on_event = on_event.clone();
         let onerror_callback = Closure::wrap(Box::new(move |error_event: web_sys::ErrorEvent| {
-            log::error!(
-                "error event: {}: {:?}",
-                error_event.message(),
-                error_event.error()
-            );
-            on_event(WsEvent::Error(error_event.message()));
+            let message = js_sys::Reflect::get(&error_event, &"message".into()).unwrap();
+            let error = js_sys::Reflect::get(&error_event, &"error".into()).unwrap();
+            log::error!("error event: {:?}: {:?}", message, error);
+            on_event(WsEvent::Error(
+                message
+                    .as_string()
+                    .unwrap_or_else(|| "Unknown error".to_string()),
+            ));
         }) as Box<dyn FnMut(web_sys::ErrorEvent)>);
         socket.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
         onerror_callback.forget();

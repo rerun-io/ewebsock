@@ -150,6 +150,7 @@ pub(crate) fn ws_connect_impl(
     {
         let on_event = on_event.clone();
         let onerror_callback = Closure::wrap(Box::new(move |error_event: web_sys::ErrorEvent| {
+            // using reflect instead of error_event.message() to avoid panic on null
             let message = js_sys::Reflect::get(&error_event, &"message".into()).unwrap_or_default();
             let error = js_sys::Reflect::get(&error_event, &"error".into()).unwrap_or_default();
             log::error!("error event: {:?}: {:?}", message, error);

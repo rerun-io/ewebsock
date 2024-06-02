@@ -22,7 +22,7 @@ fn main() {
                         eprintln!("Responded.");
                     }
                 } else {
-                    eprintln!("Message recevied not text or binary.");
+                    eprintln!("Message received not text or binary.");
                 }
             }
             eprintln!("Client left.");

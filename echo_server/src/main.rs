@@ -15,11 +15,14 @@ fn main() {
 
                 // We do not want to send back ping/pong messages.
                 if msg.is_binary() || msg.is_text() {
-                    websocket.send(msg).unwrap();
-                    eprintln!("Responded.");
+                    if let Err(err) = websocket.send(msg) {
+                        eprintln!("Error sending message: {err}");
+                        break;
+                    } else {
+                        eprintln!("Responded.");
+                    }
                 } else {
-                    eprintln!("Message recevied not text or binary, leaving.");
-                    break;
+                    eprintln!("Message recevied not text or binary.");
                 }
             }
             eprintln!("Client left.");

@@ -1,10 +1,10 @@
 [package]
 name = "ewebsock"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 description = "WebSocket client that works natively and on the web (WASM)"
 edition = "2021"
-rust-version = "1.73"
+rust-version = "1.76"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 homepage = "https://github.com/rerun-io/ewebsock"
@@ -17,6 +17,8 @@ include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 all-features = true
 targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 
+[lints]
+workspace = true
 
 [features]
 default = []

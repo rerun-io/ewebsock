@@ -139,6 +139,9 @@ pub struct Options {
 
     /// Additional subprotocols
     pub subprotocols: Option<Vec<String>>,
+
+    /// Delay
+    pub delay_blocking: Option<u64>,
 }
 
 impl Default for Options {
@@ -147,6 +150,7 @@ impl Default for Options {
             max_incoming_frame_size: 64 * 1024 * 1024,
             additional_headers: None,
             subprotocols: None,
+            delay_blocking: None,
         }
     }
 }

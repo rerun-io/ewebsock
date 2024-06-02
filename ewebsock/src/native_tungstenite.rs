@@ -1,5 +1,3 @@
-#![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
-
 use std::{
     ops::ControlFlow,
     sync::mpsc::{Receiver, TryRecvError},
@@ -121,7 +119,7 @@ pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler
     }
 
     loop {
-        let control = match socket.read_message() {
+        let control = match socket.read() {
             Ok(incoming_msg) => match incoming_msg {
                 tungstenite::protocol::Message::Text(text) => {
                     on_event(WsEvent::Message(WsMessage::Text(text)))
@@ -191,6 +189,7 @@ pub fn ws_connect_blocking(
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
+    let delay = options.delay_blocking.unwrap_or(10);
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
     let uri: http::Uri = match url.parse() {
@@ -249,22 +248,22 @@ pub fn ws_connect_blocking(
                     WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data),
                     WsMessage::Unknown(_) => panic!("You cannot send WsMessage::Unknown"),
                 };
-                if let Err(err) = socket.write_message(outgoing_message) {
+                if let Err(err) = socket.send(outgoing_message) {
                     socket.close(None).ok();
-                    socket.write_pending().ok();
+                    socket.flush().ok();
                     return Err(format!("send: {err}"));
                 }
             }
             Err(TryRecvError::Disconnected) => {
                 log::debug!("WsSender dropped - closing connection.");
                 socket.close(None).ok();
-                socket.write_pending().ok();
+                socket.flush().ok();
                 return Ok(());
             }
             Err(TryRecvError::Empty) => {}
         };
 
-        let control = match socket.read_message() {
+        let control = match socket.read() {
             Ok(incoming_msg) => {
                 did_work = true;
                 match incoming_msg {
@@ -306,7 +305,7 @@ pub fn ws_connect_blocking(
         }
 
         if !did_work {
-            std::thread::sleep(std::time::Duration::from_millis(10)); // TODO(emilk): make configurable
+            std::thread::sleep(std::time::Duration::from_millis(delay));
         }
     }
 }

@@ -189,7 +189,9 @@ pub fn ws_connect_blocking(
     on_event: &EventHandler,
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
-    let delay = options.delay_blocking.unwrap_or(10);
+    let delay = options
+        .delay_blocking
+        .unwrap_or(std::time::Duration::from_millis(10)); // default value 10ms
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
     let uri: http::Uri = match url.parse() {
@@ -305,7 +307,7 @@ pub fn ws_connect_blocking(
         }
 
         if !did_work {
-            std::thread::sleep(std::time::Duration::from_millis(delay));
+            std::thread::sleep(delay);
         }
     }
 }

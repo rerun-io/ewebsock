@@ -140,8 +140,8 @@ pub struct Options {
     /// Additional subprotocols
     pub subprotocols: Option<Vec<String>>,
 
-    /// Delay
-    pub delay_blocking: Option<u64>,
+    /// Delay blocking in ms - default 10ms
+    pub delay_blocking: Option<std::time::Duration>,
 }
 
 impl Default for Options {

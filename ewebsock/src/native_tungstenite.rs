@@ -81,7 +81,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 
 /// Connect and call the given event handler on each received event.
 ///
-/// Blocking version of [`ws_receive`], only available on native.
+/// Blocking version of [`crate::ws_receive`], only available on native.
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
@@ -179,7 +179,7 @@ pub(crate) fn ws_connect_impl(
 
 /// Connect and call the given event handler on each received event.
 ///
-/// This is a blocking variant of [`ws_connect`], only available on native.
+/// This is a blocking variant of [`crate::ws_connect`], only available on native.
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.

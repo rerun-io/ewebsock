@@ -134,7 +134,7 @@ pub struct Options {
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
 
-    /// Additional [`Request`] headers
+    /// Additional Request headers
     pub additional_headers: Option<Vec<(String, String)>>,
 
     /// Additional subprotocols

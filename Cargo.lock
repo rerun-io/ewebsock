@@ -1019,7 +1019,7 @@ checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
 name = "echo_server"
 version = "0.1.0"
 dependencies = [
- "tungstenite 0.21.0",
+ "tungstenite 0.22.0",
 ]
 
 [[package]]

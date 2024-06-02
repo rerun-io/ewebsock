@@ -12,8 +12,7 @@ pub fn into_requester(
     uri: http::Uri,
     options: Options,
 ) -> tungstenite::client::ClientRequestBuilder {
-    let mut client_request: tungstenite::client::ClientRequestBuilder =
-        tungstenite::client::ClientRequestBuilder::new(uri);
+    let mut client_request = tungstenite::client::ClientRequestBuilder::new(uri);
     if let Some(headers) = options.additional_headers {
         for (key, value) in headers {
             client_request = client_request.with_header(key, value);
@@ -89,7 +88,10 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
-    let uri: http::Uri = url.parse().unwrap();
+    let uri: http::Uri = match url.parse() {
+        Ok(uri) => uri,
+        Err(err) => return Err(format!("Failed to parse URI: {err}")),
+    };
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
 
@@ -191,7 +193,10 @@ pub fn ws_connect_blocking(
 ) -> Result<()> {
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
-    let uri: http::Uri = url.parse().unwrap();
+    let uri: http::Uri = match url.parse() {
+        Ok(uri) => uri,
+        Err(err) => return Err(format!("Failed to parse URI: {err}")),
+    };
     let (mut socket, response) = match tungstenite::client::connect_with_config(
         crate::into_requester(uri, options),
         Some(config),

@@ -1192,7 +1192,6 @@ dependencies = [
  "document-features",
  "futures",
  "futures-util",
- "http",
  "js-sys",
  "log",
  "tokio",

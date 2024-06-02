@@ -43,7 +43,6 @@ tokio = [
 
 [dependencies]
 document-features = "0.2"
-http = "1.0.0"
 log = "0.4"
 
 # native:

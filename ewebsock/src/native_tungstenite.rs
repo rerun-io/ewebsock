@@ -5,7 +5,7 @@ use std::{
 
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
-/// transfrom uri and options into a request builder
+/// transform uri and options into a request builder
 pub fn into_requester(
     uri: tungstenite::http::Uri,
     options: Options,

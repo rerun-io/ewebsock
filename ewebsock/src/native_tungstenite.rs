@@ -1,3 +1,5 @@
+//! Native implementation of the WebSocket client using the `tungstenite` crate.
+
 use std::{
     ops::ControlFlow,
     sync::mpsc::{Receiver, TryRecvError},

@@ -14,7 +14,7 @@ This is a simple [WebSocket](https://en.wikipedia.org/wiki/WebSocket) library fo
 
 ``` rust
 let options = ewebsock::Options::default();
-// add header and subprotocol to options
+// see documentation for more options
 let (mut sender, receiver) = ewebsock::connect("ws://example.com", options).unwrap();
 sender.send(ewebsock::WsMessage::Text("Hello!".into()));
 while let Some(event) = receiver.try_recv() {

@@ -135,22 +135,24 @@ pub struct Options {
     pub max_incoming_frame_size: usize,
 
     /// Additional Request headers
-    pub additional_headers: Option<Vec<(String, String)>>,
+    pub additional_headers: Vec<(String, String)>,
 
-    /// Additional subprotocols
-    pub subprotocols: Option<Vec<String>>,
+    /// Additional subprotocols -
+    /// https://www.iana.org/assignments/websocket/websocket.xml
+    /// https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous
+    pub subprotocols: Vec<String>,
 
     /// Delay blocking in ms - default 10ms
-    pub delay_blocking: Option<std::time::Duration>,
+    pub delay_blocking: std::time::Duration,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
             max_incoming_frame_size: 64 * 1024 * 1024,
-            additional_headers: None,
-            subprotocols: None,
-            delay_blocking: None,
+            additional_headers: vec![],
+            subprotocols: vec![],
+            delay_blocking: std::time::Duration::from_millis(10), // default value 10ms,
         }
     }
 }

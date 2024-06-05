@@ -6,5 +6,7 @@ target
 target_ra
 target_wasm
 
+dist/
+
 # https://github.com/lycheeverse/lychee
 .lycheecache

@@ -134,3 +134,29 @@ jobs:
         rust-version: "1.76.0"
         log-level: warn
         command: check
+
+
+  trunk:
+    name: trunk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.76.0
+          target: wasm32-unknown-unknown
+          override: true
+      - name: Download and install Trunk binary
+        run: wget -qO- https://github.com/thedodd/trunk/releases/latest/download/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+      - name: Build
+        run: cd example_app && trunk build --release --public-url $public_url  --dist ../dist/
+        env:
+          public_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          # this option will not maintain any history of your previous pages deployment
+          # set to false if you want all page build to be committed to your gh-pages branch history
+          single-commit: true

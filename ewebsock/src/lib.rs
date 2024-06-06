@@ -138,8 +138,8 @@ pub struct Options {
     pub additional_headers: Vec<(String, String)>,
 
     /// Additional subprotocols -
-    /// https://www.iana.org/assignments/websocket/websocket.xml
-    /// https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous
+    /// <https://www.iana.org/assignments/websocket/websocket.xml>
+    /// <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous>
     pub subprotocols: Vec<String>,
 
     /// Delay blocking in ms - default 10ms

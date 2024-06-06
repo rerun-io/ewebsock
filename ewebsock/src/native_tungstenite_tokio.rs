@@ -123,6 +123,7 @@ async fn ws_connect_async(
     futures_util::future::select(reader, writer).await;
 }
 
+#[allow(clippy::unnecessary_wraps)]
 pub(crate) fn ws_connect_impl(
     url: String,
     options: Options,

@@ -49,11 +49,17 @@ async fn ws_connect_async(
     on_event: EventHandler,
 ) {
     use futures::StreamExt as _;
-
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let uri: tungstenite::http::Uri = match url.parse() {
+        Ok(uri) => uri,
+        Err(err) => {
+            on_event(WsEvent::Error(err.to_string()));
+            return;
+        }
+    };
+    let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let disable_nagle = false; // God damn everyone who adds negations to the names of their variables
     let (ws_stream, _response) = match tokio_tungstenite::connect_async_with_config(
-        url,
+        crate::into_requester(uri, options),
         Some(config),
         disable_nagle,
     )
@@ -145,4 +151,19 @@ fn ws_connect_native(url: String, options: Options, on_event: EventHandler) -> W
 
 pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHandler) -> Result<()> {
     ws_connect_impl(url, options, on_event).map(|sender| sender.forget())
+}
+
+#[cfg(feature = "tokio")]
+#[test]
+fn test_connect_tokio() {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            let options = crate::Options::default();
+            // see documentation for more options
+            let (mut sender, _receiver) = crate::connect("ws://example.com", options).unwrap();
+            sender.send(crate::WsMessage::Text("Hello!".into()));
+        });
 }

@@ -5,6 +5,7 @@ use std::{
     sync::mpsc::{Receiver, TryRecvError},
 };
 
+use crate::tungstenite_common::into_requester;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -76,7 +77,7 @@ pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler
     let max_redirects = 3; // tungstenite default
 
     let (mut socket, response) = match tungstenite::client::connect_with_config(
-        crate::into_requester(uri, options),
+        into_requester(uri, options),
         Some(config),
         max_redirects,
     ) {
@@ -178,7 +179,7 @@ pub fn ws_connect_blocking(
         .parse()
         .map_err(|err| format!("Failed to parse URI: {err}"))?;
     let (mut socket, response) = match tungstenite::client::connect_with_config(
-        crate::into_requester(uri, options),
+        into_requester(uri, options),
         Some(config),
         max_redirects,
     ) {

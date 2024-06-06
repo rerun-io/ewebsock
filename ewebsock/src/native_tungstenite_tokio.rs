@@ -1,5 +1,6 @@
 use std::ops::ControlFlow;
 
+use crate::tungstenite_common::into_requester;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -59,7 +60,7 @@ async fn ws_connect_async(
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let disable_nagle = false; // God damn everyone who adds negations to the names of their variables
     let (ws_stream, _response) = match tokio_tungstenite::connect_async_with_config(
-        crate::into_requester(uri, options),
+        into_requester(uri, options),
         Some(config),
         disable_nagle,
     )
@@ -122,7 +123,6 @@ async fn ws_connect_async(
     futures_util::future::select(reader, writer).await;
 }
 
-#[allow(clippy::unnecessary_wraps)]
 pub(crate) fn ws_connect_impl(
     url: String,
     options: Options,

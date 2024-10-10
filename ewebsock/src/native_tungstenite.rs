@@ -72,7 +72,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
     let uri: tungstenite::http::Uri = url
         .parse()
-        .map_err(|err| format!("Failed to parse URI: {err}"))?;
+        .map_err(|err| format!("Failed to parse URL {url:?}: {err}"))?;
     let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
 
@@ -177,7 +177,7 @@ pub fn ws_connect_blocking(
     let max_redirects = 3; // tungstenite default
     let uri: tungstenite::http::Uri = url
         .parse()
-        .map_err(|err| format!("Failed to parse URI: {err}"))?;
+        .map_err(|err| format!("Failed to parse URL {url:?}: {err}"))?;
     let (mut socket, response) = match tungstenite::client::connect_with_config(
         into_requester(uri, options),
         Some(config),

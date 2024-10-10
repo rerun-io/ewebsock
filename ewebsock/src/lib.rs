@@ -133,16 +133,12 @@ pub struct Options {
     ///
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
-
-    /// Delay blocking in ms - default 10ms
-    pub delay_blocking: std::time::Duration,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
             max_incoming_frame_size: 64 * 1024 * 1024,
-            delay_blocking: std::time::Duration::from_millis(10),
         }
     }
 }

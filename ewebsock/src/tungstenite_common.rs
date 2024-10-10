@@ -2,7 +2,6 @@ impl From<crate::Options> for tungstenite::protocol::WebSocketConfig {
     fn from(options: crate::Options) -> Self {
         let crate::Options {
             max_incoming_frame_size,
-            ..
         } = options;
 
         Self {

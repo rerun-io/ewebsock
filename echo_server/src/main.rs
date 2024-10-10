@@ -1,3 +1,4 @@
+#![allow(deprecated)] // TODO(emilk): Remove when we update tungstenite
 #![allow(clippy::unwrap_used, clippy::disallowed_methods)] // We are just testing here.
 
 use std::{net::TcpListener, thread::spawn};
@@ -10,10 +11,10 @@ fn main() {
         spawn(move || {
             let mut websocket = tungstenite::accept(stream.unwrap()).unwrap();
             eprintln!("New client connected");
-            while let Ok(msg) = websocket.read() {
+            while let Ok(msg) = websocket.read_message() {
                 // We do not want to send back ping/pong messages.
                 if msg.is_binary() || msg.is_text() {
-                    if let Err(err) = websocket.send(msg) {
+                    if let Err(err) = websocket.write_message(msg) {
                         eprintln!("Error sending message: {err}");
                         break;
                     } else {

@@ -217,7 +217,7 @@ pub fn ws_connect_blocking(
                     WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data),
                     WsMessage::Unknown(_) => panic!("You cannot send WsMessage::Unknown"),
                 };
-                if let Err(err) = socket.write(outgoing_message) {
+                if let Err(err) = socket.send(outgoing_message) {
                     socket.close(None).ok();
                     socket.flush().ok();
                     return Err(format!("send: {err}"));

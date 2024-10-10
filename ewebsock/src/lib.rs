@@ -124,7 +124,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub(crate) type EventHandler = Box<dyn Send + Fn(WsEvent) -> ControlFlow<()>>;
 
 /// Options for a connection.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Options {
     /// The maximum size of a single incoming message frame, in bytes.
     ///
@@ -134,6 +134,19 @@ pub struct Options {
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
 
+    /// Additional Request headers.
+    ///
+    /// Currently only supported on native.
+    pub additional_headers: Vec<(String, String)>,
+
+    /// Additional subprotocols.
+    ///
+    /// <https://www.iana.org/assignments/websocket/websocket.xml>
+    /// <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous>
+    ///
+    /// Currently only supported on native.
+    pub subprotocols: Vec<String>,
+
     /// Delay blocking in ms - default 10ms
     pub delay_blocking: std::time::Duration,
 }
@@ -142,7 +155,9 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             max_incoming_frame_size: 64 * 1024 * 1024,
-            delay_blocking: std::time::Duration::from_millis(10),
+            additional_headers: vec![],
+            subprotocols: vec![],
+            delay_blocking: std::time::Duration::from_millis(10), // default value 10ms,
         }
     }
 }

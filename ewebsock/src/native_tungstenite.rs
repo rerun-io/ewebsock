@@ -5,6 +5,7 @@ use std::{
     sync::mpsc::{Receiver, TryRecvError},
 };
 
+use crate::tungstenite_common::into_requester;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
 /// This is how you send [`WsMessage`]s to the server.
@@ -64,21 +65,27 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 
 /// Connect and call the given event handler on each received event.
 ///
-/// Blocking version of [`ws_receive`], only available on native.
+/// Blocking version of [`crate::ws_receive`], only available on native.
 ///
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let uri: tungstenite::http::Uri = url
+        .parse()
+        .map_err(|err| format!("Failed to parse URL {url:?}: {err}"))?;
+    let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
 
-    let (mut socket, response) =
-        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
-            Ok(result) => result,
-            Err(err) => {
-                return Err(format!("Connect: {err}"));
-            }
-        };
+    let (mut socket, response) = match tungstenite::client::connect_with_config(
+        into_requester(uri, options),
+        Some(config),
+        max_redirects,
+    ) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(format!("Connect: {err}"));
+        }
+    };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(
@@ -166,15 +173,21 @@ pub fn ws_connect_blocking(
     rx: &Receiver<WsMessage>,
 ) -> Result<()> {
     let delay = options.delay_blocking;
-    let config = tungstenite::protocol::WebSocketConfig::from(options);
+    let config = tungstenite::protocol::WebSocketConfig::from(options.clone());
     let max_redirects = 3; // tungstenite default
-    let (mut socket, response) =
-        match tungstenite::client::connect_with_config(url, Some(config), max_redirects) {
-            Ok(result) => result,
-            Err(err) => {
-                return Err(format!("Connect: {err}"));
-            }
-        };
+    let uri: tungstenite::http::Uri = url
+        .parse()
+        .map_err(|err| format!("Failed to parse URL {url:?}: {err}"))?;
+    let (mut socket, response) = match tungstenite::client::connect_with_config(
+        into_requester(uri, options),
+        Some(config),
+        max_redirects,
+    ) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(format!("Connect: {err}"));
+        }
+    };
 
     log::debug!("WebSocket HTTP response code: {}", response.status());
     log::trace!(
@@ -217,7 +230,7 @@ pub fn ws_connect_blocking(
                     WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data),
                     WsMessage::Unknown(_) => panic!("You cannot send WsMessage::Unknown"),
                 };
-                if let Err(err) = socket.write(outgoing_message) {
+                if let Err(err) = socket.send(outgoing_message) {
                     socket.close(None).ok();
                     socket.flush().ok();
                     return Err(format!("send: {err}"));
@@ -277,4 +290,12 @@ pub fn ws_connect_blocking(
             std::thread::sleep(delay);
         }
     }
+}
+
+#[test]
+fn test_connect() {
+    let options = crate::Options::default();
+    // see documentation for more options
+    let (mut sender, _receiver) = crate::connect("ws://example.com", options).unwrap();
+    sender.send(crate::WsMessage::Text("Hello!".into()));
 }

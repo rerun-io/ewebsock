@@ -15,3 +15,18 @@ impl From<crate::Options> for tungstenite::protocol::WebSocketConfig {
         }
     }
 }
+
+/// transform uri and options into a request builder
+pub fn into_requester(
+    uri: tungstenite::http::Uri,
+    options: crate::Options,
+) -> tungstenite::client::ClientRequestBuilder {
+    let mut client_request = tungstenite::client::ClientRequestBuilder::new(uri);
+    for (key, value) in options.additional_headers {
+        client_request = client_request.with_header(key, value);
+    }
+    for subprotocol in options.subprotocols {
+        client_request = client_request.with_sub_protocol(subprotocol);
+    }
+    client_request
+}

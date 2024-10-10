@@ -19,8 +19,10 @@ fn main() {
                     } else {
                         eprintln!("Responded.");
                     }
+                } else if msg.is_close() {
+                    eprintln!("Connection closed.");
                 } else {
-                    eprintln!("Message received not text or binary.");
+                    eprintln!("Unknown message received: {msg:?}");
                 }
             }
             eprintln!("Client left.");

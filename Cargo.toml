@@ -10,6 +10,23 @@ members = ["ewebsock", "example_app", "echo_server"]
 # eframe = { path = "../egui/eframe" }
 
 
+[workspace.dependencies]
+async-stream = "0.3"
+document-features = "0.2"
+eframe = "0.26.2"
+env_logger = "0.10"
+futures = "0.3"
+futures-util = { version = "0.3", default-features = false }
+js-sys = "0.3"
+log = "0.4"
+tokio = "1.16"
+tokio-tungstenite = "0.23"
+tungstenite = "0.23"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = "0.3"
+
+
 [workspace.lints.rust]
 unsafe_code = "deny"
 

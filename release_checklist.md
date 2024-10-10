@@ -1,6 +1,6 @@
 - [ ] Update `CHANGELOG.md` with `./scripts/generate_changelog.py`
 - [ ] Bump version number
-- [ ] `./example_app/build_web.sh --open`
+- [ ] `(cd example_app && trunk serve)`
 - [ ] `git commit -m 'Release 0.x.0 - summary'`
 - [ ] `cargo publish -p ewebsock`
 - [ ] `git tag -a 0.x.0 -m 'Release 0.x.0 - summary'`

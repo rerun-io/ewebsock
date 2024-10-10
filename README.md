@@ -38,5 +38,5 @@ cargo run -p example_app
 
 # web mode
 # install trunk with `cargo install trunk` - https://trunkrs.dev/
-cd example_app/ && trunk serve
+(cd example_app && trunk serve)
 ```

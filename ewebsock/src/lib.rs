@@ -134,12 +134,17 @@ pub struct Options {
     /// Ignored on Web.
     pub max_incoming_frame_size: usize,
 
-    /// Additional Request headers
+    /// Additional Request headers.
+    ///
+    /// Currently only supported on native.
     pub additional_headers: Vec<(String, String)>,
 
-    /// Additional subprotocols -
+    /// Additional subprotocols.
+    ///
     /// <https://www.iana.org/assignments/websocket/websocket.xml>
     /// <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous>
+    ///
+    /// Currently only supported on native.
     pub subprotocols: Vec<String>,
 
     /// Delay blocking in ms - default 10ms

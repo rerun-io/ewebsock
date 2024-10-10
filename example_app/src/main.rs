@@ -12,6 +12,7 @@ async fn main() -> eframe::Result<()> {
 fn main() -> eframe::Result<()> {
     main_impl()
 }
+
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
 fn main_impl() -> Result<(), eframe::Error> {

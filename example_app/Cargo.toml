@@ -19,17 +19,17 @@ tokio = ["ewebsock/tokio", "dep:tokio"]
 [dependencies]
 ewebsock = { path = "../ewebsock", features = ["tls"] }
 
-eframe = "0.26.2" # Gives us egui, epi and web+native backends
-log = "0.4"
-env_logger = "0.10"
+eframe.workspace = true
+log.workspace = true
+env_logger.workspace = true
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tokio = { version = "1.16", optional = true, features = [
+tokio = { workspace = true, optional = true, features = [
     "macros",
     "rt-multi-thread",
 ] }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen-futures = "0.4"
+wasm-bindgen-futures.workspace = true

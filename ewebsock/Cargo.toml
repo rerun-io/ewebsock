@@ -42,32 +42,29 @@ tokio = [
 
 
 [dependencies]
-document-features = "0.2"
-log = "0.4"
+document-features.workspace = true
+log.workspace = true
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tungstenite = { version = "0.23" }
+tungstenite.workspace = true
 
 # Optional dependencies for feature "tokio":
-async-stream = { version = "0.3", optional = true }
-futures = { version = "0.3", optional = true }
-futures-util = { version = "0.3", optional = true, default-features = false, features = [
+async-stream = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+futures-util = { workspace = true, optional = true, default-features = false, features = [
   "sink",
   "std",
 ] }
-tokio = { version = "1.16", features = ["rt", "sync"], optional = true }
-tokio-tungstenite = { version = "0.23", optional = true }
+tokio = { workspace = true, features = ["rt", "sync"], optional = true }
+tokio-tungstenite = { workspace = true, optional = true }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2"
-js-sys = "0.3"
-wasm-bindgen-futures = "0.4"
-
-[dependencies.web-sys]
-version = "0.3"
-features = [
+js-sys.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+web-sys = { workspace = true, features = [
   "BinaryType",
   "Blob",
   "ErrorEvent",
@@ -75,4 +72,4 @@ features = [
   "MessageEvent",
   "ProgressEvent",
   "WebSocket",
-]
+] }

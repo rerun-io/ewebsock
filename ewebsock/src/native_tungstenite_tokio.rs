@@ -53,7 +53,9 @@ async fn ws_connect_async(
     let uri: tungstenite::http::Uri = match url.parse() {
         Ok(uri) => uri,
         Err(err) => {
-            on_event(WsEvent::Error(err.to_string()));
+            on_event(WsEvent::Error(format!(
+                "Failed to parse URL {url:?}: {err}"
+            )));
             return;
         }
     };

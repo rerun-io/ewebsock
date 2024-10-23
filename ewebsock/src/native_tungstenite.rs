@@ -70,6 +70,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 /// # Errors
 /// All errors are returned to the caller, and NOT reported via `on_event`.
 pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler) -> Result<()> {
+    let delay = options.delay_blocking;
     let uri: tungstenite::http::Uri = url
         .parse()
         .map_err(|err| format!("Failed to parse URL {url:?}: {err}"))?;
@@ -135,7 +136,12 @@ pub fn ws_receiver_blocking(url: &str, options: Options, on_event: &EventHandler
                 .map_err(|err| format!("Failed to close connection: {err}"));
         }
 
-        std::thread::sleep(std::time::Duration::from_millis(10));
+        // without the check we wouldn't yield at all on some platforms
+        if delay == std::time::Duration::ZERO {
+            std::thread::yield_now();
+        } else {
+            std::thread::sleep(delay);
+        }
     }
 }
 
@@ -287,7 +293,12 @@ pub fn ws_connect_blocking(
         }
 
         if !did_work {
-            std::thread::sleep(delay);
+            // without the check we wouldn't yield at all on some platforms
+            if delay == std::time::Duration::ZERO {
+                std::thread::yield_now();
+            } else {
+                std::thread::sleep(delay);
+            }
         }
     }
 }

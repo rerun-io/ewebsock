@@ -157,7 +157,9 @@ impl Default for Options {
             max_incoming_frame_size: 64 * 1024 * 1024,
             additional_headers: vec![],
             subprotocols: vec![],
-            delay_blocking: std::time::Duration::from_millis(10), // default value 10ms,
+            // let the OS schedule something else, otherwise busy-loop
+            // TODO: use polling on native instead
+            delay_blocking: std::time::Duration::from_millis(0),
         }
     }
 }

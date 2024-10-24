@@ -147,8 +147,12 @@ pub struct Options {
     /// Currently only supported on native.
     pub subprotocols: Vec<String>,
 
-    /// Delay blocking in ms - default 10ms
-    pub delay_blocking: std::time::Duration,
+    /// Socket read timeout.
+    ///
+    /// Reads will block forever if this is set to `None` or `Some(Duration::ZERO)`.
+    ///
+    /// Defaults to 10ms.
+    pub read_timeout: Option<std::time::Duration>,
 }
 
 impl Default for Options {
@@ -159,7 +163,7 @@ impl Default for Options {
             subprotocols: vec![],
             // let the OS schedule something else, otherwise busy-loop
             // TODO: use polling on native instead
-            delay_blocking: std::time::Duration::from_millis(0),
+            read_timeout: Some(std::time::Duration::from_millis(10)),
         }
     }
 }

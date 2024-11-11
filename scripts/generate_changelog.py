@@ -16,6 +16,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
+from datetime import date
 from typing import Any, Optional
 
 import requests
@@ -25,15 +26,6 @@ from tqdm import tqdm
 OWNER = "rerun-io"
 REPO = "ewebsock"
 INCLUDE_LABELS = False  # It adds quite a bit of visual noise
-OFFICIAL_RERUN_DEVS = [
-    "abey79",
-    "emilk",
-    "jleibs",
-    "jprochazk",
-    "nikolausWest",
-    "teh-cmc",
-    "Wumpf",
-]
 
 
 @dataclass
@@ -119,13 +111,41 @@ def print_section(crate: str, items: list[str]) -> None:
     print()
 
 
+def commit_range(new_version: str) -> str:
+    parts = new_version.split(".")
+    assert len(parts) == 3, "Expected version to be on the format X.Y.Z"
+    major = int(parts[0])
+    minor = int(parts[1])
+    patch = int(parts[2])
+
+    if 0 < patch:
+        # A patch release.
+        # Include changes since last patch release.
+        # This assumes we've cherry-picked stuff for this release.
+        diff_since_version = f"0.{minor}.{patch - 1}"
+    elif 0 < minor:
+        # A minor release
+        # The diff should span everything since the last minor release.
+        # The script later excludes duplicated automatically, so we don't include stuff that
+        # was part of intervening patch releases.
+        diff_since_version = f"{major}.{minor - 1}.0"
+    else:
+        # A major release
+        # The diff should span everything since the last major release.
+        # The script later excludes duplicated automatically, so we don't include stuff that
+        # was part of intervening minor/patch releases.
+        diff_since_version = f"{major - 1}.{minor}.0"
+
+    return f"{diff_since_version}..HEAD"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a changelog.")
-    parser.add_argument("--commit-range", help="e.g. 0.1.0..HEAD", required=True)
+    parser.add_argument("--version", required=True, help="The version of the new release, e.g. 0.42.0")
     args = parser.parse_args()
 
     repo = Repo(".")
-    commits = list(repo.iter_commits(args.commit_range))
+    commits = list(repo.iter_commits(commit_range(args.version)))
     commits.reverse()  # Most recent last
     commit_infos = list(map(get_commit_info, commits))
 
@@ -169,8 +189,7 @@ def main() -> None:
 
             if pr_info is not None:
                 gh_user_name = pr_info.gh_user_name
-                if gh_user_name not in OFFICIAL_RERUN_DEVS:
-                    summary += f" (thanks [@{gh_user_name}](https://github.com/{gh_user_name})!)"
+                summary += f" by [@{gh_user_name}](https://github.com/{gh_user_name})"
 
             prs.append(summary)
 
@@ -180,8 +199,9 @@ def main() -> None:
         line = line[0].upper() + line[1:]  # Upper-case first letter
         prs[i] = line
 
+    print(f"## {args.version} - {date.today()}")
     print()
-    print(f"Full diff at https://github.com/rerun-io/{REPO}/compare/{args.commit_range}")
+    print(f"Full diff at https://github.com/{OWNER}/{REPO}/compare/{args.commit_range}")
     print()
     print_section("PRs", prs)
     print_section("Unsorted commits", unsorted_commits)

@@ -35,7 +35,7 @@ ignore = []
 
 [bans]
 multiple-versions = "deny"
-wildcards = "allow" # We use them for examples
+wildcards = "deny"
 deny = [
   { name = "openssl", reason = "Use rustls" },
   { name = "openssl-sys", reason = "Use rustls" },
@@ -58,7 +58,7 @@ allow = [
   "BSL-1.0",                        # https://tldrlegal.com/license/boost-software-license-1.0-explained
   "CC0-1.0",                        # https://creativecommons.org/publicdomain/zero/1.0/
   "ISC",                            # https://www.tldrlegal.com/license/isc-license
-  "LicenseRef-UFL-1.0",             # See https://github.com/emilk/egui/issues/2321
+  "LicenseRef-UFL-1.0",             # no official SPDX, see https://github.com/emilk/egui/issues/2321
   "MIT-0",                          # https://choosealicense.com/licenses/mit-0/
   "MIT",                            # https://tldrlegal.com/license/mit-license
   "MPL-2.0",                        # https://www.mozilla.org/en-US/MPL/2.0/FAQ/ - see Q11. Used by webpki-roots on Linux.

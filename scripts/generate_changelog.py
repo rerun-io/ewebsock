@@ -88,11 +88,18 @@ def fetch_pr_info(pr_number: int) -> Optional[PrInfo]:
 
 
 def get_commit_info(commit: Any) -> CommitInfo:
-    match = re.match(r"(.*) \(#(\d+)\)", commit.summary)
-    if match:
+    # Squash-merge commits:
+    if match := re.match(r"(.*) \(#(\d+)\)", commit.summary):
         title = str(match.group(1))
         pr_number = int(match.group(2))
         return CommitInfo(hexsha=commit.hexsha, title=title, pr_number=pr_number)
+
+    # Normal merge commits:
+    elif match := re.match(r"Merge pull request #(\d+) from (.*)", commit.summary):
+        title = str(match.group(2))
+        pr_number = int(match.group(1))
+        return CommitInfo(hexsha=commit.hexsha, title=title, pr_number=pr_number)
+
     else:
         return CommitInfo(hexsha=commit.hexsha, title=commit.summary, pr_number=None)
 
@@ -111,7 +118,7 @@ def print_section(crate: str, items: list[str]) -> None:
     print()
 
 
-def commit_range(new_version: str) -> str:
+def calc_commit_range(new_version: str) -> str:
     parts = new_version.split(".")
     assert len(parts) == 3, "Expected version to be on the format X.Y.Z"
     major = int(parts[0])
@@ -144,8 +151,10 @@ def main() -> None:
     parser.add_argument("--version", required=True, help="The version of the new release, e.g. 0.42.0")
     args = parser.parse_args()
 
+    commit_range = calc_commit_range(args.version)
+
     repo = Repo(".")
-    commits = list(repo.iter_commits(commit_range(args.version)))
+    commits = list(repo.iter_commits(commit_range))
     commits.reverse()  # Most recent last
     commit_infos = list(map(get_commit_info, commits))
 
@@ -201,7 +210,7 @@ def main() -> None:
 
     print(f"## {args.version} - {date.today()}")
     print()
-    print(f"Full diff at https://github.com/{OWNER}/{REPO}/compare/{args.commit_range}")
+    print(f"Full diff at https://github.com/{OWNER}/{REPO}/compare/{commit_range}")
     print()
     print_section("PRs", prs)
     print_section("Unsorted commits", unsorted_commits)

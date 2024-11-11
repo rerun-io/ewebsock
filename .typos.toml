@@ -7,4 +7,4 @@ extend-exclude = ["docs/example_app.js"]
 
 
 [default.extend-words]
-teh = "teh" # part of @teh-cmc
+teh = "teh"     # part of @teh-cmc

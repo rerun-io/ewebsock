@@ -17,7 +17,7 @@ tokio = ["ewebsock/tokio", "dep:tokio"]
 
 
 [dependencies]
-ewebsock = { path = "../ewebsock", features = ["tls"] }
+ewebsock = { workspace = true, features = ["tls"] }
 
 eframe.workspace = true
 log.workspace = true

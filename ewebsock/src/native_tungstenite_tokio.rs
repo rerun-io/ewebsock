@@ -86,10 +86,10 @@ async fn ws_connect_async(
 
     let writer = outgoing_messages_stream
         .map(|ws_message| match ws_message {
-            WsMessage::Text(text) => tungstenite::protocol::Message::Text(text),
-            WsMessage::Binary(data) => tungstenite::protocol::Message::Binary(data),
-            WsMessage::Ping(data) => tungstenite::protocol::Message::Ping(data),
-            WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data),
+            WsMessage::Text(text) => tungstenite::protocol::Message::Text(text.into()),
+            WsMessage::Binary(data) => tungstenite::protocol::Message::Binary(data.into()),
+            WsMessage::Ping(data) => tungstenite::protocol::Message::Ping(data.into()),
+            WsMessage::Pong(data) => tungstenite::protocol::Message::Pong(data.into()),
             WsMessage::Unknown(_) => panic!("You cannot send WsMessage::Unknown"),
         })
         .map(Ok)
@@ -99,16 +99,16 @@ async fn ws_connect_async(
         let control = match event {
             Ok(message) => match message {
                 tungstenite::protocol::Message::Text(text) => {
-                    on_event(WsEvent::Message(WsMessage::Text(text)))
+                    on_event(WsEvent::Message(WsMessage::Text(text.to_string())))
                 }
                 tungstenite::protocol::Message::Binary(data) => {
-                    on_event(WsEvent::Message(WsMessage::Binary(data)))
+                    on_event(WsEvent::Message(WsMessage::Binary(data.into())))
                 }
                 tungstenite::protocol::Message::Ping(data) => {
-                    on_event(WsEvent::Message(WsMessage::Ping(data)))
+                    on_event(WsEvent::Message(WsMessage::Ping(data.into())))
                 }
                 tungstenite::protocol::Message::Pong(data) => {
-                    on_event(WsEvent::Message(WsMessage::Pong(data)))
+                    on_event(WsEvent::Message(WsMessage::Pong(data.into())))
                 }
                 tungstenite::protocol::Message::Close(_) => on_event(WsEvent::Closed),
                 tungstenite::protocol::Message::Frame(_) => ControlFlow::Continue(()),

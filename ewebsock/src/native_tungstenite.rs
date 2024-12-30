@@ -29,6 +29,7 @@ impl WsSender {
     /// Send a message.
     ///
     /// You have to wait for [`WsEvent::Opened`] before you can start sending messages.
+    #[allow(clippy::needless_pass_by_ref_mut)] // Allowed to ensure consistent API with WASM
     pub fn send(&mut self, msg: WsMessage) {
         if let Some(tx) = &self.tx {
             tx.send(msg).ok();

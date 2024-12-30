@@ -15,7 +15,7 @@ ewebsock = { version = "0.8.0", path = "ewebsock", default-features = false }
 
 async-stream = "0.3"
 document-features = "0.2"
-eframe = "0.29.1"
+eframe = "0.30"
 env_logger = "0.10"
 futures = "0.3"
 futures-util = { version = "0.3", default-features = false }

@@ -1,5 +1,5 @@
 ## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
-
+* Update MSRV to Rust 1.80
 
 ## 0.8.0 - 2024-11-11 - Fix native performance bug
 * Fix blocking receiver sleeping after every read [#48](https://github.com/rerun-io/ewebsock/pull/48) by [@jprochazk](https://github.com/jprochazk)

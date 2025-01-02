@@ -20,12 +20,6 @@ fn main() -> eframe::Result<()> {
 fn main_impl() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
 
-    // Setup a CryptoProvider to be able to use wss
-    match rustls::crypto::ring::default_provider().install_default() {
-        Ok(()) => {} // Do nothing crypto provider install successful
-        Err(_) => log::warn!("failed to install CryptoProvider"),
-    }
-
     let app = example_app::ExampleApp::default();
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(

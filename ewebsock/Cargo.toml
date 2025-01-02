@@ -23,6 +23,10 @@ workspace = true
 [features]
 default = []
 
+## Enables the ring feature on the rustls create to allow connections from native apps to WSS (Not needed if your supply your own CryptoProvider)
+rustls_ring = ["dep:rustls", "rustls/ring"]
+
+## Enables tls support for native
 tls = ["tungstenite/rustls-tls-webpki-roots"]
 
 ## Opt-in to the tokio executor.
@@ -47,6 +51,7 @@ log.workspace = true
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rustls = { workspace = true, optional = true}
 tungstenite.workspace = true
 
 # Optional dependencies for feature "tokio":

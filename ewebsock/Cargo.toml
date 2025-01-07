@@ -23,7 +23,8 @@ workspace = true
 [features]
 default = []
 
-## Enables the ring feature on the rustls create to allow connections from native apps to WSS (Not needed if your supply your own CryptoProvider)
+## Enables the ring feature on the rustls create to allow connections from native apps to WSS.
+## (Not needed if you supply your own CryptoProvider)
 rustls_ring = ["dep:rustls", "rustls/ring"]
 
 ## Enables tls support for native

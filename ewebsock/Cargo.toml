@@ -27,8 +27,8 @@ default = []
 ## (Not needed if you supply your own CryptoProvider)
 rustls_ring = ["dep:rustls", "rustls/ring"]
 
-## Enables tls support for native
-tls = ["tungstenite/rustls-tls-webpki-roots"]
+## Enables tls support for native with rustls-tls-webpki-roots
+tls = ["tungstenite/rustls-tls-webpki-roots", "tokio-tungstenite?/rustls-tls-webpki-roots"]
 
 ## Opt-in to the tokio executor.
 ##

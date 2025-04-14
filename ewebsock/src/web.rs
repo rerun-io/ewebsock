@@ -178,8 +178,26 @@ pub(crate) fn ws_connect_impl(
     }
 
     {
-        let onclose_callback = Closure::wrap(Box::new(move |_| {
-            on_event(WsEvent::Closed);
+        let onclose_callback = Closure::wrap(Box::new(move |event| {
+            use js_sys::Reflect;
+            use wasm_bindgen::JsValue;
+
+            // Extract optional `code` field from JsValue
+            // See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+            pub fn get_optional_code(event: &JsValue) -> Option<u16> {
+                Reflect::get(event, &JsValue::from_str("code"))
+                    .ok()?
+                    .as_f64()
+                    .and_then(|num| {
+                        if num >= 0.0 && num <= u16::MAX as f64 {
+                            Some(num as u16)
+                        } else {
+                            None
+                        }
+                    })
+            }
+            let maybe_code = get_optional_code(&event);
+            on_event(WsEvent::Closed(maybe_code));
         }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
         socket.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));
         onclose_callback.forget();

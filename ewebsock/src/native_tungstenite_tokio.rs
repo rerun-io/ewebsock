@@ -110,7 +110,9 @@ async fn ws_connect_async(
                 tungstenite::protocol::Message::Pong(data) => {
                     on_event(WsEvent::Message(WsMessage::Pong(data)))
                 }
-                tungstenite::protocol::Message::Close(_) => on_event(WsEvent::Closed),
+                tungstenite::protocol::Message::Close(event) => {
+                    on_event(WsEvent::Closed(event.as_ref().map(|x| x.code.into())))
+                }
                 tungstenite::protocol::Message::Frame(_) => ControlFlow::Continue(()),
             },
             Err(err) => on_event(WsEvent::Error(err.to_string())),

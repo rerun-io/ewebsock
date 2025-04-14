@@ -246,7 +246,8 @@ fn read_from_socket(
                 on_event(WsEvent::Message(WsMessage::Pong(data)))
             }
             tungstenite::protocol::Message::Close(close) => {
-                on_event(WsEvent::Closed);
+                let maybe_code = close.as_ref().map(|x| x.code.into());
+                on_event(WsEvent::Closed(maybe_code));
                 log::debug!("WebSocket close received: {close:?}");
                 ControlFlow::Break(())
             }

@@ -178,27 +178,28 @@ pub(crate) fn ws_connect_impl(
     }
 
     {
+        use wasm_bindgen::JsValue;
         let onclose_callback = Closure::wrap(Box::new(move |event| {
-            use js_sys::Reflect;
-            use wasm_bindgen::JsValue;
-
-            // Extract optional `code` field from JsValue
+            // Extracts optional `code` field from JsValue
             // See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
-            pub fn get_optional_code(event: &JsValue) -> Option<u16> {
-                Reflect::get(event, &JsValue::from_str("code"))
+            let get_optional_code = |event| {
+                // also it seems required filed by spec, tokio does not think so, so we also
+                js_sys::Reflect::get(event, &JsValue::from_str("code"))
                     .ok()?
                     .as_f64()
                     .and_then(|num| {
-                        if num >= 0.0 && num <= u16::MAX as f64 {
+                        // also 4999 is max value by spec, but tokio returns even larger
+                        // so we stick to behave same way as tokio
+                        if num >= 1000.0 && num <= u16::MAX as f64 {
                             Some(num as u16)
                         } else {
                             None
                         }
                     })
-            }
+            };
             let maybe_code = get_optional_code(&event);
             on_event(WsEvent::Closed(maybe_code));
-        }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
+        }) as Box<dyn FnMut(JsValue)>);
         socket.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));
         onclose_callback.forget();
     }

@@ -21,7 +21,7 @@ targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 workspace = true
 
 [features]
-default = ["tokio", "tls"]
+default = []
 
 tls = ["tungstenite/rustls-tls-webpki-roots"]
 
@@ -72,5 +72,4 @@ web-sys = { workspace = true, features = [
   "MessageEvent",
   "ProgressEvent",
   "WebSocket",
-  "CloseEvent",
 ] }

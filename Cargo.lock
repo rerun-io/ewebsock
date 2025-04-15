@@ -1174,6 +1174,7 @@ dependencies = [
  "ewebsock",
  "log",
  "tokio",
+ "wasm-bindgen-futures",
  "web-sys",
 ]
 

@@ -4,7 +4,7 @@ version = "0.8.0"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
 description = "WebSocket client that works natively and on the web (WASM)"
 edition = "2021"
-rust-version = "1.76"
+rust-version = "1.81"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 homepage = "https://github.com/rerun-io/ewebsock"
@@ -69,7 +69,6 @@ tokio-tungstenite = { workspace = true, optional = true }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys.workspace = true
 wasm-bindgen.workspace = true
-wasm-bindgen-futures.workspace = true
 web-sys = { workspace = true, features = [
   "BinaryType",
   "Blob",

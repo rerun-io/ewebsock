@@ -29,6 +29,7 @@ impl Drop for WsSender {
 
 impl WsSender {
     /// Send the message to the server.
+    #[allow(clippy::needless_pass_by_ref_mut)]
     pub fn send(&mut self, msg: WsMessage) {
         if let Some(socket) = &mut self.socket {
             let result = match msg {

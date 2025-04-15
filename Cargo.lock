@@ -1162,7 +1162,6 @@ dependencies = [
  "tokio-tungstenite",
  "tungstenite",
  "wasm-bindgen",
- "wasm-bindgen-futures",
  "web-sys",
 ]
 
@@ -1175,7 +1174,6 @@ dependencies = [
  "ewebsock",
  "log",
  "tokio",
- "wasm-bindgen-futures",
  "web-sys",
 ]
 

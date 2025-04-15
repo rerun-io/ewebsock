@@ -30,7 +30,9 @@ all-features = true
 
 [advisories]
 version = 2
-ignore = []
+ignore = [
+  "RUSTSEC-2024-0436", # unmaintained paste pulled via accesskit_windows, should be fixed with next egui accesskit update
+]
 
 
 [bans]

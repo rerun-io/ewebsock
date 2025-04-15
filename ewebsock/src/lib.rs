@@ -77,8 +77,8 @@ pub enum WsEvent {
     /// An error occurred.
     Error(String),
 
-    /// The connection has been closed.
-    Closed,
+    /// The connection has been closed, possibly with a reason code.
+    Closed(Option<u16>),
 }
 
 /// Receiver for incoming [`WsEvent`]s.

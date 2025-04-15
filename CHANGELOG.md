@@ -1,4 +1,5 @@
 ## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
+* CloseEvent error code provided [#59](https://github.com/rerun-io/ewebsock/issues/59) by [@dzmitry-lahoda](https://github.com/dzmitry-lahoda)
 
 
 ## 0.8.0 - 2024-11-11 - Fix native performance bug

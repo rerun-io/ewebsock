@@ -73,7 +73,7 @@ pub(crate) fn ws_connect_impl(
     _ignored_options: Options,
     on_event: EventHandler,
 ) -> Result<WsSender> {
-    // Based on https://rustwasm.github.io/wasm-bindgen/examples/websockets.html
+    // Based on https://wasm-bindgen.github.io/wasm-bindgen/examples/websockets.html
 
     use wasm_bindgen::closure::Closure;
     use wasm_bindgen::JsCast as _;

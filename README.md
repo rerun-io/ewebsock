@@ -4,7 +4,7 @@
 [![Latest version](https://img.shields.io/crates/v/ewebsock.svg)](https://crates.io/crates/ewebsock)
 [![Documentation](https://docs.rs/ewebsock/badge.svg)](https://docs.rs/ewebsock)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
-[![Build Status](https://github.com/rerun-io/ewebsock/workflows/CI/badge.svg)](https://github.com/rerun-io/ewebsock/actions?workflow=CI)
+[![Build Status](https://github.com/rerun-io/ewebsock/workflows/Rust/badge.svg)](https://github.com/rerun-io/ewebsock/actions?workflow=CI)
 ![MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Apache](https://img.shields.io/badge/license-Apache-blue.svg)
 
@@ -12,7 +12,7 @@ This is a simple [WebSocket](https://en.wikipedia.org/wiki/WebSocket) library fo
 
 ## Usage
 
-``` rust
+```rust
 let options = ewebsock::Options::default();
 // see documentation for more options
 let (mut sender, receiver) = ewebsock::connect("ws://example.com", options).unwrap();

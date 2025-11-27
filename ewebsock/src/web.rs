@@ -1,6 +1,7 @@
 #![allow(trivial_casts)]
 
 use std::{ops::ControlFlow, rc::Rc};
+use wasm_bindgen::JsValue;
 
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
 
@@ -70,7 +71,7 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
 #[allow(clippy::needless_pass_by_value)] // For consistency with the native version
 pub(crate) fn ws_connect_impl(
     url: String,
-    _ignored_options: Options,
+    options: Options,
     on_event: EventHandler,
 ) -> Result<WsSender> {
     // Based on https://wasm-bindgen.github.io/wasm-bindgen/examples/websockets.html
@@ -78,8 +79,10 @@ pub(crate) fn ws_connect_impl(
     use wasm_bindgen::closure::Closure;
     use wasm_bindgen::JsCast as _;
 
-    // Connect to an server
-    let socket = web_sys::WebSocket::new(&url).map_err(string_from_js_value)?;
+    // Connect to a server
+    let socket =
+        web_sys::WebSocket::new_with_str_sequence(&url, &JsValue::from(options.subprotocols))
+            .map_err(string_from_js_value)?;
     let socket = Rc::new(socket);
 
     // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling

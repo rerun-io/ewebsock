@@ -139,12 +139,17 @@ pub struct Options {
     /// Currently only supported on native.
     pub additional_headers: Vec<(String, String)>,
 
-    /// Additional subprotocols.
+    /// Subprotocols that may be used for this websocket connection, by order of preference.
     ///
-    /// <https://www.iana.org/assignments/websocket/websocket.xml>
+    /// These values may either come from the
+    /// [IANA WebSocket Subprotocol Name Registry](https://www.iana.org/assignments/websocket/websocket.xml),
+    /// or may be a custom name jointly understood by the client and the server.
+    ///
+    /// Values from this vector will end up in the Sec-WebSocket-Protocol header
+    /// while performing the [websocket connection upgrade](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Protocol_upgrade_mechanism#upgrading_to_a_websocket_connection).
+    ///
+    /// Further reading about the distinction between extensions and subprotocols :
     /// <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#miscellaneous>
-    ///
-    /// Currently only supported on native.
     pub subprotocols: Vec<String>,
 
     /// Socket read timeout.

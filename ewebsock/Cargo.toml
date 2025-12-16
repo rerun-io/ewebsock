@@ -25,6 +25,9 @@ default = []
 
 tls = ["tungstenite/rustls-tls-webpki-roots"]
 
+## Enables tls support for native with rustls-tls-native-roots
+rustls-tls-native-roots = ["tungstenite/rustls-tls-native-roots","tokio-tungstenite?/rustls-tls-native-roots"]
+
 ## Opt-in to the tokio executor.
 ##
 ## This adds a lot of dependencies,

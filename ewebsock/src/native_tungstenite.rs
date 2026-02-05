@@ -58,6 +58,10 @@ pub(crate) fn ws_receive_impl(url: String, options: Options, on_event: EventHand
         .name("ewebsock".to_owned())
         .spawn(move || {
             if let Err(err) = ws_receiver_blocking(&url, options, &on_event) {
+                #[expect(
+                    unused_must_use,
+                    reason = "we intentionally ignore the return of `on_event`"
+                )]
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -134,6 +138,10 @@ pub(crate) fn ws_connect_impl(
         .name("ewebsock".to_owned())
         .spawn(move || {
             if let Err(err) = ws_connect_blocking(&url, options, &on_event, &rx) {
+                #[expect(
+                    unused_must_use,
+                    reason = "we intentionally ignore the return of `on_event`"
+                )]
                 on_event(WsEvent::Error(err));
             } else {
                 log::debug!("WebSocket connection closed.");
@@ -247,6 +255,10 @@ fn read_from_socket(
                 on_event(WsEvent::Message(WsMessage::Pong(data)))
             }
             tungstenite::protocol::Message::Close(close) => {
+                #[expect(
+                    unused_must_use,
+                    reason = "we intentionally ignore the return of `on_event`"
+                )]
                 on_event(WsEvent::Closed);
                 log::debug!("WebSocket close received: {close:?}");
                 ControlFlow::Break(())

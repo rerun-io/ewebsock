@@ -4,7 +4,7 @@ members = ["ewebsock", "example_app", "echo_server"]
 
 [patch.crates-io]
 # If you want to use the bleeding edge version of egui/eframe:
-# eframe = { git = "https://github.com/emilk/egui", branch = "master" }
+# eframe = { git = "https://github.com/emilk/egui", branch = "main" }
 
 # If you want to use a fork:
 # eframe = { path = "../egui/eframe" }

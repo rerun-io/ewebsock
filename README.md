@@ -37,6 +37,6 @@ Then test the library with:
 cargo run -p example_app
 
 # web mode
-# install trunk with `cargo install trunk` - https://trunkrs.dev/
+# install trunk with `cargo install trunk` - https://trunk-rs.github.io/trunk/
 (cd example_app && trunk serve)
 ```

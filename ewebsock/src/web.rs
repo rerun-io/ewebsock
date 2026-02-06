@@ -154,7 +154,7 @@ pub(crate) fn ws_connect_impl(
             // using reflect instead of error_event.message() to avoid panic on null
             let message = js_sys::Reflect::get(&error_event, &"message".into()).unwrap_or_default();
             let error = js_sys::Reflect::get(&error_event, &"error".into()).unwrap_or_default();
-            log::error!("error event: {:?}: {:?}", message, error);
+            log::error!("error event: {message:?}: {error:?}");
             #[expect(
                 unused_must_use,
                 reason = "we intentionally ignore the return of `on_event`"

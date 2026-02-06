@@ -157,7 +157,11 @@ pub(crate) fn ws_connect_impl(
             // using reflect instead of error_event.message() to avoid panic on null
             let message = js_sys::Reflect::get(&error_event, &"message".into()).unwrap_or_default();
             let error = js_sys::Reflect::get(&error_event, &"error".into()).unwrap_or_default();
-            log::error!("error event: {:?}: {:?}", message, error);
+            log::error!("error event: {message:?}: {error:?}");
+            #[expect(
+                unused_must_use,
+                reason = "we intentionally ignore the return of `on_event`"
+            )]
             on_event(WsEvent::Error(
                 message
                     .as_string()
@@ -183,6 +187,10 @@ pub(crate) fn ws_connect_impl(
 
     {
         let onclose_callback = Closure::wrap(Box::new(move |_| {
+            #[expect(
+                unused_must_use,
+                reason = "we intentionally ignore the return of `on_event`"
+            )]
             on_event(WsEvent::Closed);
         }) as Box<dyn FnMut(wasm_bindgen::JsValue)>);
         socket.set_onclose(Some(onclose_callback.as_ref().unchecked_ref()));

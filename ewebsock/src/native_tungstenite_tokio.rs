@@ -54,6 +54,10 @@ async fn ws_connect_async(
     let uri: tungstenite::http::Uri = match url.parse() {
         Ok(uri) => uri,
         Err(err) => {
+            #[expect(
+                unused_must_use,
+                reason = "we intentionally ignore the return of `on_event`"
+            )]
             on_event(WsEvent::Error(format!(
                 "Failed to parse URL {url:?}: {err}"
             )));
@@ -71,6 +75,10 @@ async fn ws_connect_async(
     {
         Ok(result) => result,
         Err(err) => {
+            #[expect(
+                unused_must_use,
+                reason = "we intentionally ignore the return of `on_event`"
+            )]
             on_event(WsEvent::Error(err.to_string()));
             return;
         }

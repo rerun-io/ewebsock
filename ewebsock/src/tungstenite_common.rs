@@ -5,14 +5,11 @@ impl From<crate::Options> for tungstenite::protocol::WebSocketConfig {
             ..
         } = options;
 
-        Self {
-            max_frame_size: if max_incoming_frame_size == usize::MAX {
-                None
-            } else {
-                Some(max_incoming_frame_size)
-            },
-            ..Default::default()
-        }
+        Self::default().max_frame_size(if max_incoming_frame_size == usize::MAX {
+            None
+        } else {
+            Some(max_incoming_frame_size)
+        })
     }
 }
 

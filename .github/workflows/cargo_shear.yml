@@ -16,5 +16,5 @@ jobs:
 
       - name: Shear
         run: |
-          cargo +stable install cargo-shear@1.1.11 --locked
+          cargo +stable install cargo-shear@1.11.2 --locked
           cargo shear

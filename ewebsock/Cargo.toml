@@ -81,3 +81,6 @@ web-sys = { workspace = true, features = [
   "ProgressEvent",
   "WebSocket",
 ] }
+
+[package.metadata.cargo-shear]
+ignored = ["rustls"] # Added to allow users to easily enable a crypto provider on native. Not actually use in crate.

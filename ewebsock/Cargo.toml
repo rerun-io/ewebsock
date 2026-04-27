@@ -75,3 +75,7 @@ web-sys = { workspace = true, features = [
   "ProgressEvent",
   "WebSocket",
 ] }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-futures.workspace = true
+wasm-bindgen-test = "0.3"

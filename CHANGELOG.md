@@ -1,4 +1,5 @@
 ## [Unreleased](https://github.com/rerun-io/ewebsock/compare/latest...HEAD)
+* Fix web binary sends changing the socket's incoming binary type to `Blob`, and release Blob fallback callbacks after `FileReader` finishes.
 
 
 ## 0.8.0 - 2024-11-11 - Fix native performance bug

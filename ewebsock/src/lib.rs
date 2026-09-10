@@ -98,8 +98,11 @@ impl WsReceiver {
     pub fn new_with_callback(wake_up: impl Fn() + Send + Sync + 'static) -> (Self, EventHandler) {
         let (tx, rx) = std::sync::mpsc::channel();
         let on_event = Box::new(move |event| {
-            if tx.send(event).is_ok() {
-                wake_up(); // wake up UI thread
+            let result = tx.send(event);
+
+            wake_up(); // wake up UI thread
+
+            if result.is_ok() {
                 ControlFlow::Continue(())
             } else {
                 ControlFlow::Break(())

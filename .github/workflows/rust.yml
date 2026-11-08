@@ -128,6 +128,31 @@ jobs:
 
   # ---------------------------------------------------------------------------
 
+  check_wasm64:
+    name: Check wasm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly # wasm64 is a tier 3 target: nightly and a std built from source
+          override: true
+          components: rust-src
+
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check wasm64
+        uses: actions-rs/cargo@v1
+        env:
+          RUSTFLAGS: "" # Don't fail on warnings in the std built from source
+        with:
+          command: check
+          args: -Zbuild-std=std,panic_abort --target wasm64-unknown-unknown -p ewebsock --lib
+
+  # ---------------------------------------------------------------------------
+
   cargo-deny:
     name: Check Rust dependencies (cargo-deny)
     runs-on: ubuntu-latest

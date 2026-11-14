@@ -4,7 +4,7 @@ on:
     branches:
       - "main"
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
 
 name: Rust
 
@@ -157,13 +157,12 @@ jobs:
     name: Check Rust dependencies (cargo-deny)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: EmbarkStudios/cargo-deny-action@v2
-      with:
-        rust-version: "1.92"
-        log-level: warn
-        command: check
-
+      - uses: actions/checkout@v3
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          rust-version: "1.92"
+          log-level: warn
+          command: check
 
   trunk:
     name: trunk

@@ -16,31 +16,31 @@
 
 #![warn(missing_docs)] // let's keep ewebsock well-documented
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 #[cfg(not(feature = "tokio"))]
 mod native_tungstenite;
 
 use std::ops::ControlFlow;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 #[cfg(not(feature = "tokio"))]
 pub use native_tungstenite::*;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 #[cfg(feature = "tokio")]
 mod native_tungstenite_tokio;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 #[cfg(feature = "tokio")]
 pub use native_tungstenite_tokio::*;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 mod tungstenite_common;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 mod web;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 pub use web::*;
 
 // ----------------------------------------------------------------------------

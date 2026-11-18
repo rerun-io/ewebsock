@@ -18,33 +18,33 @@ impl Default for ExampleApp {
 }
 
 impl eframe::App for ExampleApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         #[cfg(not(target_arch = "wasm32"))]
         {
-            egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-                egui::menu::bar(ui, |ui| {
+            egui::Panel::top("top_panel").show(ui, |ui| {
+                egui::MenuBar::new().ui(ui, |ui| {
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                            ui.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
                     });
                 });
             });
         }
 
-        egui::TopBottomPanel::top("server").show(ctx, |ui| {
+        egui::Panel::top("server").show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.label("URL:");
                 if ui.text_edit_singleline(&mut self.url).lost_focus()
                     && ui.input(|i| i.key_pressed(egui::Key::Enter))
                 {
-                    self.connect(ctx.clone());
+                    self.connect(ui.clone());
                 }
             });
         });
 
         if !self.error.is_empty() {
-            egui::TopBottomPanel::top("error").show(ctx, |ui| {
+            egui::Panel::top("error").show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.label("Error:");
                     ui.colored_label(egui::Color32::RED, &self.error);
@@ -53,7 +53,7 @@ impl eframe::App for ExampleApp {
         }
 
         if let Some(frontend) = &mut self.frontend {
-            frontend.ui(ctx);
+            frontend.ui(ui);
         }
     }
 }
@@ -93,12 +93,12 @@ impl FrontEnd {
         }
     }
 
-    fn ui(&mut self, ctx: &egui::Context) {
+    fn ui(&mut self, ui: &mut egui::Ui) {
         while let Some(event) = self.ws_receiver.try_recv() {
             self.events.push(event);
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.label("Message to send:");
                 if ui.text_edit_singleline(&mut self.text_to_send).lost_focus()

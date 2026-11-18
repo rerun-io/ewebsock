@@ -53,27 +53,27 @@ exclude = [
 
   # Strings with replacements.
   '/__VIEWER_VERSION__/', # Replacement variable __VIEWER_VERSION__.
-  '/\$',                  # Replacement variable $.
-  '/GIT_HASH/',           # Replacement variable GIT_HASH.
-  '\{\}',                 # Ignore links with string interpolation.
-  '\$relpath\^',          # Relative paths as used by rerun_cpp's doc header.
-  '%7B.+%7D',             # Ignore strings that look like ready to use links but contain a replacement strings. The URL escaping is for '{.+}' (this seems to be needed for html embedded urls since lychee assumes they use this encoding).
-  '%7B%7D',               # Ignore links with string interpolation, escaped variant.
+  '/\$', # Replacement variable $.
+  '/GIT_HASH/', # Replacement variable GIT_HASH.
+  '\{\}', # Ignore links with string interpolation.
+  '\$relpath\^', # Relative paths as used by rerun_cpp's doc header.
+  '%7B.+%7D', # Ignore strings that look like ready to use links but contain a replacement strings. The URL escaping is for '{.+}' (this seems to be needed for html embedded urls since lychee assumes they use this encoding).
+  '%7B%7D', # Ignore links with string interpolation, escaped variant.
 
   # Local links that require further setup.
   'http://127.0.0.1',
   'http://localhost',
-  'recording:/',      # rrd recording link.
+  'recording:/', # rrd recording link.
   'ws:/',
-  're_viewer.js',     # Build artifact that html is linking to.
+  're_viewer.js', # Build artifact that html is linking to.
 
   # Api endpoints.
   'https://fonts.googleapis.com/', # Font API entrypoint, not a link.
-  'https://fonts.gstatic.com/',    # Font API entrypoint, not a link.
-  'https://tel.rerun.io/',         # Analytics endpoint.
+  'https://fonts.gstatic.com/', # Font API entrypoint, not a link.
+  'https://tel.rerun.io/', # Analytics endpoint.
 
   # Avoid rate limiting.
-  'https://crates.io/crates/.*',                  # Avoid crates.io rate-limiting
+  'https://crates.io/crates/.*', # Avoid crates.io rate-limiting
   'https://github.com/rerun-io/rerun/commit/\.*', # Ignore links to our own commits (typically in changelog).
-  'https://github.com/rerun-io/rerun/pull/\.*',   # Ignore links to our own pull requests (typically in changelog).
+  'https://github.com/rerun-io/rerun/pull/\.*', # Ignore links to our own pull requests (typically in changelog).
 ]

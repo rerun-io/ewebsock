@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["ewebsock", "example_app", "echo_server"]
+members = ["echo_server", "ewebsock", "example_app"]
 
 [patch.crates-io]
 # If you want to use the bleeding edge version of egui/eframe:
@@ -8,7 +8,6 @@ members = ["ewebsock", "example_app", "echo_server"]
 
 # If you want to use a fork:
 # eframe = { path = "../egui/eframe" }
-
 
 [workspace.dependencies]
 ewebsock = { version = "0.8.0", path = "ewebsock", default-features = false }
@@ -29,7 +28,6 @@ wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 web-sys = "0.3"
 
-
 [workspace.lints.rust]
 unsafe_code = "deny"
 
@@ -40,7 +38,7 @@ rust_2018_idioms = { level = "warn", priority = -1 }
 rust_2021_prelude_collisions = "warn"
 semicolon_in_expressions_from_macros = "warn"
 trivial_numeric_casts = "warn"
-unsafe_op_in_unsafe_fn = "warn"                         # `unsafe_op_in_unsafe_fn` may become the default in future Rust versions: https://github.com/rust-lang/rust/issues/71668
+unsafe_op_in_unsafe_fn = "warn" # `unsafe_op_in_unsafe_fn` may become the default in future Rust versions: https://github.com/rust-lang/rust/issues/71668
 unused_extern_crates = "warn"
 unused_import_braces = "warn"
 unused_lifetimes = "warn"
@@ -64,12 +62,12 @@ cloned_instead_of_copied = "warn"
 dbg_macro = "warn"
 debug_assert_with_mut_call = "warn"
 derive_partial_eq_without_eq = "warn"
-disallowed_macros = "warn"                  # See clippy.toml
-disallowed_methods = "warn"                 # See clippy.toml
-disallowed_names = "warn"                   # See clippy.toml
-disallowed_script_idents = "warn"           # See clippy.toml
-disallowed_types = "warn"                   # See clippy.toml
-doc_include_without_cfg  = "warn"
+disallowed_macros = "warn" # See clippy.toml
+disallowed_methods = "warn" # See clippy.toml
+disallowed_names = "warn" # See clippy.toml
+disallowed_script_idents = "warn" # See clippy.toml
+disallowed_types = "warn" # See clippy.toml
+doc_include_without_cfg = "warn"
 doc_link_with_quotes = "warn"
 doc_markdown = "warn"
 empty_enum = "warn"
@@ -204,6 +202,6 @@ wildcard_dependencies = "warn"
 wildcard_imports = "warn"
 zero_sized_map_values = "warn"
 
-manual_range_contains = "allow"       # this is better on 'allow'
-map_unwrap_or = "allow"               # this is better on 'allow'
-ref_patterns = "allow"                # It's nice to avoid ref pattern, but there are some situations that are hard (impossible?) to express without.
+manual_range_contains = "allow" # this is better on 'allow'
+map_unwrap_or = "allow" # this is better on 'allow'
+ref_patterns = "allow" # It's nice to avoid ref pattern, but there are some situations that are hard (impossible?) to express without.

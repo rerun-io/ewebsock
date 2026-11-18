@@ -2,16 +2,16 @@
 name = "ewebsock"
 version = "0.8.0"
 authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
-description = "WebSocket client that works natively and on the web (WASM)"
+categories = ["web-programming", "wasm"]
 edition = "2021"
-rust-version = "1.92"
+homepage = "https://github.com/rerun-io/ewebsock"
+include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
+keywords = ["websocket", "websockets", "portable", "native", "web"]
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
-homepage = "https://github.com/rerun-io/ewebsock"
 repository = "https://github.com/rerun-io/ewebsock"
-categories = ["web-programming", "wasm"]
-keywords = ["websocket", "websockets", "portable", "native", "web"]
-include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
+rust-version = "1.92"
+description = "WebSocket client that works natively and on the web (WASM)"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -31,7 +31,7 @@ rustls_ring = ["dep:rustls", "rustls/ring"]
 tls = ["tungstenite/rustls-tls-webpki-roots", "tokio-tungstenite?/rustls-tls-webpki-roots"]
 
 ## Enables tls support for native with rustls-tls-native-roots
-rustls-tls-native-roots = ["tungstenite/rustls-tls-native-roots","tokio-tungstenite?/rustls-tls-native-roots"]
+rustls-tls-native-roots = ["tungstenite/rustls-tls-native-roots", "tokio-tungstenite?/rustls-tls-native-roots"]
 
 ## Opt-in to the tokio executor.
 ##
@@ -48,23 +48,19 @@ tokio = [
   "dep:tokio-tungstenite",
 ]
 
-
 [dependencies]
 document-features.workspace = true
 log.workspace = true
 
 # native:
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-rustls = { workspace = true, optional = true}
+rustls = { workspace = true, optional = true }
 tungstenite.workspace = true
 
 # Optional dependencies for feature "tokio":
 async-stream = { workspace = true, optional = true }
 futures = { workspace = true, optional = true }
-futures-util = { workspace = true, optional = true, default-features = false, features = [
-  "sink",
-  "std",
-] }
+futures-util = { workspace = true, optional = true, default-features = false, features = ["sink", "std"] }
 tokio = { workspace = true, features = ["rt", "sync"], optional = true }
 tokio-tungstenite = { workspace = true, optional = true }
 
@@ -72,15 +68,7 @@ tokio-tungstenite = { workspace = true, optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys.workspace = true
 wasm-bindgen.workspace = true
-web-sys = { workspace = true, features = [
-  "BinaryType",
-  "Blob",
-  "ErrorEvent",
-  "FileReader",
-  "MessageEvent",
-  "ProgressEvent",
-  "WebSocket",
-] }
+web-sys = { workspace = true, features = ["BinaryType", "Blob", "ErrorEvent", "FileReader", "MessageEvent", "ProgressEvent", "WebSocket"] }
 
 [package.metadata.cargo-shear]
 ignored = ["rustls"] # Added to allow users to easily enable a crypto provider on native. Not actually use in crate.

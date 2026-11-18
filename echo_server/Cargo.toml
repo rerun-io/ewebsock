@@ -6,7 +6,7 @@ edition = "2021"
 include = ["../LICENSE-APACHE", "../LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 license = "MIT OR Apache-2.0"
 publish = false
-rust-version = "1.92"
+rust-version = "1.95"
 
 [dependencies]
 tungstenite.workspace = true

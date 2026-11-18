@@ -10,7 +10,7 @@ keywords = ["websocket", "websockets", "portable", "native", "web"]
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/rerun-io/ewebsock"
-rust-version = "1.92"
+rust-version = "1.95"
 description = "WebSocket client that works natively and on the web (WASM)"
 
 [package.metadata.docs.rs]

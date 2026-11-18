@@ -14,7 +14,7 @@ ewebsock = { version = "0.8.0", path = "ewebsock", default-features = false }
 
 async-stream = "0.3"
 document-features = "0.2"
-eframe = "0.31.1"
+eframe = "0.37"
 env_logger = "0.11.8"
 futures = "0.3"
 futures-util = { version = "0.3", default-features = false }
@@ -22,8 +22,8 @@ js-sys = "0.3"
 log = "0.4"
 rustls = { version = "0.23.20", default-features = false }
 tokio = "1.16"
-tokio-tungstenite = "0.29"
-tungstenite = "0.29"
+tokio-tungstenite = "0.30"
+tungstenite = "0.30"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 web-sys = "0.3"
@@ -70,7 +70,7 @@ disallowed_types = "warn" # See clippy.toml
 doc_include_without_cfg = "warn"
 doc_link_with_quotes = "warn"
 doc_markdown = "warn"
-empty_enum = "warn"
+empty_enums = "warn"
 empty_enum_variants_with_brackets = "warn"
 enum_glob_use = "warn"
 equatable_if_let = "warn"

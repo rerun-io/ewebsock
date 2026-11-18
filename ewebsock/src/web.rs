@@ -76,8 +76,8 @@ pub(crate) fn ws_connect_impl(
 ) -> Result<WsSender> {
     // Based on https://wasm-bindgen.github.io/wasm-bindgen/examples/websockets.html
 
-    use wasm_bindgen::closure::Closure;
     use wasm_bindgen::JsCast as _;
+    use wasm_bindgen::closure::Closure;
 
     // Connect to a server
     let socket =

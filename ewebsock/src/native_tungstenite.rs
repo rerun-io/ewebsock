@@ -6,8 +6,8 @@ use std::{
     sync::mpsc::{Receiver, TryRecvError},
 };
 
-use tungstenite::stream::MaybeTlsStream;
 use tungstenite::WebSocket;
+use tungstenite::stream::MaybeTlsStream;
 
 use crate::tungstenite_common::into_requester;
 use crate::{EventHandler, Options, Result, WsEvent, WsMessage};
@@ -286,7 +286,7 @@ fn set_read_timeout(
     value: Option<std::time::Duration>,
 ) -> Result<()> {
     // zero timeout is the same as no timeout
-    if value.is_none() || value.is_some_and(|value| value.is_zero()) {
+    if value.is_none_or(|value| value.is_zero()) {
         return Ok(());
     }
 

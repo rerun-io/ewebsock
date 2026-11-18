@@ -22,7 +22,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: default
-          toolchain: 1.92
+          toolchain: 1.95
           override: true
 
       - name: Install packages (Linux)
@@ -107,7 +107,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.92
+          toolchain: 1.95
           target: wasm32-unknown-unknown
           override: true
           components: clippy
@@ -160,7 +160,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: EmbarkStudios/cargo-deny-action@v2
         with:
-          rust-version: "1.92"
+          rust-version: "1.95"
           log-level: warn
           command: check
 
@@ -172,7 +172,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.92
+          toolchain: 1.95
           target: wasm32-unknown-unknown
           override: true
       - name: Download and install Trunk binary

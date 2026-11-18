@@ -29,7 +29,10 @@ all-features = true
 [advisories]
 version = 2
 ignore = [
-  "RUSTSEC-2024-0436", # unmaintained paste pulled via accesskit_windows, should be fixed with next egui accesskit update
+  "RUSTSEC-2026-0192", # ttf-parser is unmaintained. Only brought in via winit/sctk-adwaita (wayland window frame rendering)
+  "RUSTSEC-2026-0370", # only used by example and no upstream fix available yet
+  "RUSTSEC-2026-0371", # see above
+  "RUSTSEC-2026-0372", # see above
 ]
 
 [bans]
